@@ -1,15 +1,90 @@
 <div class="ui center aligned container">
 <h1 class="ui header">{{question}}</h1>
-	<div class="ui segment form">
-		<div class="field">
-			<label>Name:</label>
-			<input placeholder="Idea name..." type="text">
-			
-		</div>
-		<div class="field">
-			<label>Description:</label>
-			<textarea rows="2"></textarea>
-		</div>
-		 <button class="ui button" type="submit">Submit</button>
+	<!-- Entering Idea!-->
+	<div ng-if="mode==1">
+		<form novalidate ng-submit="submitIdea()" class="ui segment form">
+			<div class="field">
+				<label>Name:</label>
+				<input ng-model = "idea.name" placeholder="Idea name..." type="text">
+				
+			</div>
+			<div class="field">
+				<label>Description:</label>
+				<textarea ng-model = "idea.description" rows="3"></textarea>
+			</div>
+			 <button class="ui button" type="submit">Submit</button>
+		</form>
 	</div>
+
+	<!-- Fighting!-->
+	<div ng-if="mode==2">
+		<div ng-repeat="fighter in currentFight track by $index">
+			<div ng-click="voteFor($index)" class="ui form segment">
+				<div class="inline field">
+					<label>Name:</label>
+					{{ideas[fighter].name}}
+				</div>
+				<div class="inline field">
+					<label>Description:</label>
+					{{ideas[fighter].description}}
+				</div>
+			</div>
+			<span ng-if="$index==0">VS</br></br></span>
+		</div>
+	</div>
+
+	<!-- Winner!-->
+	<div ng-if="mode==3">
+		<div class="ui form segment">
+			<div class="inline field">
+				<label>Name:</label>
+				{{currentWinner.name}}
+			</div>
+			<div class="inline field">
+				<label>Description:</label>
+				{{currentWinner.description}}
+			</div>
+			<div ng-click = "testNext()" class="inline field">
+				<label>Votes:</label>
+				{{currentWinner.votes}}
+			</div>
+		</div>
+	</div>
+
+	<!-- Enter big idea!-->
+	<div ng-if="mode==4">
+		<form novalidate ng-submit="submitUberIdea(uberIdea)" class="ui segment form">
+			<div class="inline field">
+				<label>Champion ideas:</label>
+				<span ng-repeat = "champion in winners">{{champion.name}}, </span>
+			</div>
+			<div class="field">
+				<label>&Uuml;ber Idea:</label>
+				<textarea ng-model = "uberIdea" rows="3"></textarea>
+			</div>
+			<div ng-click = "testNext()" class="inline field">
+				<label>Ideas used:</label>
+				{{ideasUsed()}}
+			</div>
+			<button class="ui button" type="submit">Submit</button>
+		</form>
+	</div>
+
+	<div ng-if="mode==5">
+		<div ng-repeat="uber in uberIdeas track by $index">
+			<div ng-click="uberVoteFor(uber.id)" class="ui form segment">
+				<div class="inline field">
+					<label>Strength:</label>
+					{{uber.strength}}
+				</div>
+				<div class="field">
+					<label>&Uuml;ber Idea:</label>
+					{{uber.description}}
+				</div>
+			</div>
+			<span ng-if="$index%2==0">VS</br></br></span>
+		</div>
+	</div>
+
+
 </div>
