@@ -9,7 +9,7 @@ angular.module('myApp.view1', ['ngRoute'])
   });
 }])
 
-.controller('View1Ctrl', ['$scope',function($scope) {
+.controller('View1Ctrl', ['$scope', '$http',function($scope, $http) {
 
 
 $scope.question = "Enter an idea";
@@ -40,32 +40,81 @@ $scope.uberIdeas[0] = {id:0, description: "The functionality of google but with 
 $scope.submitIdea = function() {
 	//Temp just put in array
 	$scope.ideas.push($scope.idea);
+	$http.post(
+		"http://localhost:3457" + '/ideas/create', {"idea": $scope.idea}
+			);
 	console.log($scope.ideas);
-	$scope.fights[0] = []
-	$scope.fights[1] = []
-	$scope.fights[0][0] = 0;
-	$scope.fights[0][1] = 2;
-	$scope.fights[1][0] = 3;
-	$scope.currentFight = $scope.fights[0];
-	$scope.mode = 2;
-	$scope.question = "Choose a victor"
+	
+	
 };
+
+
+$scope.ideaFromId = function (id_s) {
+		for(var i=0;i<$scope.ideas.length;i++) 
+	    if($scope.ideas[i].id==id_s) 
+	        return $scope.ideas[i]
+}
+
+$scope.requestIdeas = function () {
+	$http.post(
+		"http://localhost:3457" + '/ideas/index', {test: "yes"}
+			)
+		.then(function (res) {
+			$scope.ideas = res.data.ideas
+			$scope.mode = 2;
+			console.log($scope.ideas);
+			$scope.question = "Choose a victor"
+			$scope.fights[0] = []
+			$scope.fights[1] = []
+			$scope.fights[2] = []
+			$scope.fights[0][0] = 1;
+			$scope.fights[0][1] = 2;
+			$scope.fights[1][0] = 3;
+			$scope.fights[1][1] = 4;
+			$scope.fights[2][0] = 2;
+			$scope.fights[2][1] = 3;
+			$scope.currentFight = 0;
+			})
+	
+}
 
 $scope.voteFor = function(whoId) {
 	//Temp just put in array
-	$scope.vote = $scope.ideas[$scope.currentFight[whoId]];
+	
+	$scope.vote = whoId;
 	console.log($scope.vote);
-	$scope.winners.push($scope.ideas[$scope.currentFight[whoId]]);
-	$scope.winners.push($scope.ideas[1]);
-	$scope.currentWinner = $scope.ideas[$scope.currentFight[whoId]];
-	$scope.currentWinner.votes = 1;
-	$scope.mode = 3;
-	$scope.question = "Winner!"
+	$http.post(
+		"http://localhost:3457" + '/ideas/vote', {id:$scope.vote}
+			).then(function (res) {
+				$http.post(
+					"http://localhost:3457" + '/ideas/request_winner', {ids:[$scope.fights[$scope.currentFight][0], $scope.fights[$scope.currentFight][1]]}
+						).then(function (res) {
+							console.log("data")
+							console.log(res.data)
+							$scope.currentWinner = res.data;
+							$scope.currentWinner.votes = res.data.popularity;
+							$scope.mode = 3;
+							$scope.question = "Winner!"
+							if($scope.currentFight == $scope.fights.length-1)
+							{
+
+								$scope.winners.push(res.data);
+							}
+						})
+			})
+	//$scope.winners.push($scope.ideas[1]);
 };
 
 $scope.testNext = function() {
+	console.log($scope.winners)
 	$scope.question = "Combine the winners"
 	$scope.mode = 4;
+	$scope.currentFight++
+	if($scope.currentFight < $scope.fights.length)
+	{
+		$scope.mode = 2;
+		$scope.question = "Choose a victor"
+	}
 }
 
 $scope.ideasUsed = function() {
@@ -79,6 +128,9 @@ $scope.ideasUsed = function() {
 }
 
 $scope.submitUberIdea = function(form) {
+	$http.post(
+		"http://localhost:3457" + '/ideas/destroy_all', {test: "yes"}
+			)
 	//Temp just put in array
 	$scope.uberIdeas.push({id:1,description:form,strength:1});
 	console.log($scope.uberIdeas);

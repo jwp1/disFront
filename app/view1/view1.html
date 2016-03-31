@@ -13,20 +13,21 @@
 				<textarea ng-model = "idea.description" rows="3"></textarea>
 			</div>
 			 <button class="ui button" type="submit">Submit</button>
+			 <div class="ui button" ng-click="requestIdeas()">Submit</div>
 		</form>
 	</div>
 
 	<!-- Fighting!-->
 	<div ng-if="mode==2">
-		<div ng-repeat="fighter in currentFight track by $index">
-			<div ng-click="voteFor($index)" class="ui form segment">
+		<div ng-repeat="fighter in fights[currentFight] track by $index">
+			<div ng-click="voteFor(fighter)" class="ui form segment">
 				<div class="inline field">
 					<label>Name:</label>
-					{{ideas[fighter].name}}
+					{{ideaFromId(fighter).name}}
 				</div>
 				<div class="inline field">
 					<label>Description:</label>
-					{{ideas[fighter].description}}
+					{{ideaFromId(fighter).description}}
 				</div>
 			</div>
 			<span ng-if="$index==0">VS</br></br></span>
