@@ -12,7 +12,7 @@ angular.module('myApp.view1', ['ngRoute'])
 .controller('View1Ctrl', ['$scope', '$http',function($scope, $http) {
 
 
-$scope.question = "Enter an idea";
+$scope.questions = [];
 // Modes:
 // 0 - Wait
 // 1 - Enter idea
@@ -27,6 +27,8 @@ $scope.fights = [];
 $scope.winners = [];
 $scope.currentFight = [];
 $scope.currentWinner = {};
+$scope.currentRound = 0;
+$scope.rounds = 0;
 $scope.uberIdea = ""
 
 
@@ -37,6 +39,16 @@ $scope.ideas[1] = {name: "Yahoo", description: "Another search engine"};
 $scope.uberIdeas = [];
 $scope.uberIdeas[0] = {id:0, description: "The functionality of google but with the aesthetic of yahoo",strength:2};
 
+$scope.loadGame = function () {
+	$http.post(
+		"http://localhost:3457" + '/games/show', {test: "yes"}
+			)
+		.then(function (res) {
+			$scope.rounds = res.data.game.rounds
+			$scope.questions = res.data.questions;
+			console.log(res.data)
+			});
+}
 $scope.submitIdea = function() {
 	//Temp just put in array
 	$scope.ideas.push($scope.idea);
@@ -57,22 +69,14 @@ $scope.ideaFromId = function (id_s) {
 
 $scope.requestIdeas = function () {
 	$http.post(
-		"http://localhost:3457" + '/ideas/index', {test: "yes"}
+		"http://localhost:3457" + '/ideas/index', {round: $scope.currentRound}
 			)
 		.then(function (res) {
 			$scope.ideas = res.data.ideas
 			$scope.mode = 2;
 			console.log($scope.ideas);
 			$scope.question = "Choose a victor"
-			$scope.fights[0] = []
-			$scope.fights[1] = []
-			$scope.fights[2] = []
-			$scope.fights[0][0] = 1;
-			$scope.fights[0][1] = 2;
-			$scope.fights[1][0] = 3;
-			$scope.fights[1][1] = 4;
-			$scope.fights[2][0] = 2;
-			$scope.fights[2][1] = 3;
+			$scope.fights[0] = $scope.ideas
 			$scope.currentFight = 0;
 			})
 	
@@ -87,7 +91,7 @@ $scope.voteFor = function(whoId) {
 		"http://localhost:3457" + '/ideas/vote', {id:$scope.vote}
 			).then(function (res) {
 				$http.post(
-					"http://localhost:3457" + '/ideas/request_winner', {ids:[$scope.fights[$scope.currentFight][0], $scope.fights[$scope.currentFight][1]]}
+					"http://localhost:3457" + '/ideas/request_winner', {id: "hello"}
 						).then(function (res) {
 							console.log("data")
 							console.log(res.data)
@@ -106,6 +110,14 @@ $scope.voteFor = function(whoId) {
 };
 
 $scope.testNext = function() {
+	$scope.currentRound++
+	if($scope.currentRound != $scope.rounds)
+		$scope.mode = 1;
+	else
+		$scope.goUberRound()
+}
+
+$scope.goUberRound = function() {
 	console.log($scope.winners)
 	$scope.question = "Combine the winners"
 	$scope.mode = 4;
@@ -114,7 +126,7 @@ $scope.testNext = function() {
 	{
 		$scope.mode = 2;
 		$scope.question = "Choose a victor"
-	}
+	}	
 }
 
 $scope.ideasUsed = function() {
@@ -137,5 +149,11 @@ $scope.submitUberIdea = function(form) {
 	$scope.mode = 5;
 	$scope.question = "Choose a final victor"
 };
+
+$scope.appendChampion = function(champion) {
+	$('#uberIdeaBox').val($('#uberIdeaBox').val()+champion);
+}
+
+$scope.loadGame();
 
 }]);
