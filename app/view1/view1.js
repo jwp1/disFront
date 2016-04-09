@@ -39,21 +39,29 @@ $scope.ideas[1] = {name: "Yahoo", description: "Another search engine"};
 $scope.uberIdeas = [];
 $scope.uberIdeas[0] = {id:0, description: "The functionality of google but with the aesthetic of yahoo",strength:2};
 
+$scope.ideaTitleSwap = function () {
+	if ($scope.questions[$scope.currentRound] != undefined)
+		$scope.question = $scope.questions[$scope.currentRound].name
+	else
+		$scope.question = "Enter an idea"
+};
+
 $scope.loadGame = function () {
 	$http.post(
 		"http://localhost:3457" + '/games/show', {test: "yes"}
 			)
 		.then(function (res) {
+			$scope.game = res.data.game
 			$scope.rounds = res.data.game.rounds
 			$scope.questions = res.data.questions;
+			$scope.ideaTitleSwap();
 			console.log(res.data)
 			});
 }
 $scope.submitIdea = function() {
 	//Temp just put in array
-	$scope.ideas.push($scope.idea);
 	$http.post(
-		"http://localhost:3457" + '/ideas/create', {"idea": $scope.idea}
+		"http://localhost:3457" + '/ideas/create', {"idea": $scope.idea, "game":$scope.game.id, round: $scope.currentRound}
 			);
 	console.log($scope.ideas);
 	
@@ -69,7 +77,7 @@ $scope.ideaFromId = function (id_s) {
 
 $scope.requestIdeas = function () {
 	$http.post(
-		"http://localhost:3457" + '/ideas/index', {round: $scope.currentRound}
+		"http://localhost:3457" + '/ideas/index', {game: $scope.game.id, round: $scope.currentRound}
 			)
 		.then(function (res) {
 			$scope.ideas = res.data.ideas
@@ -88,10 +96,10 @@ $scope.voteFor = function(whoId) {
 	$scope.vote = whoId;
 	console.log($scope.vote);
 	$http.post(
-		"http://localhost:3457" + '/ideas/vote', {id:$scope.vote}
+		"http://localhost:3457" + '/ideas/vote', {game: $scope.game.id, id:$scope.vote}
 			).then(function (res) {
 				$http.post(
-					"http://localhost:3457" + '/ideas/request_winner', {id: "hello"}
+					"http://localhost:3457" + '/ideas/request_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
 						).then(function (res) {
 							console.log("data")
 							console.log(res.data)
@@ -111,6 +119,7 @@ $scope.voteFor = function(whoId) {
 
 $scope.testNext = function() {
 	$scope.currentRound++
+	$scope.ideaTitleSwap();
 	if($scope.currentRound != $scope.rounds)
 		$scope.mode = 1;
 	else
