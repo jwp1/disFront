@@ -90,6 +90,31 @@ $scope.requestIdeas = function () {
 	
 }
 
+$scope.requestWinner = function () {
+	$http.post(
+		"http://localhost:3457" + '/ideas/request_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
+			).then(function (res) {
+				console.log("data")
+				console.log(res.data)
+				if(!res.data.error)
+				{
+					$scope.currentWinner = res.data;
+					$scope.currentWinner.votes = res.data.popularity;
+					$scope.mode = 3;
+					$scope.question = "Winner!"
+					if($scope.currentFight == $scope.fights.length-1)
+					{
+
+						$scope.winners.push(res.data);
+					}
+				}
+				else
+				{
+					alert("Winner not yet decided")
+				}
+			})
+}
+
 $scope.voteFor = function(whoId) {
 	//Temp just put in array
 	
@@ -99,19 +124,9 @@ $scope.voteFor = function(whoId) {
 		"http://localhost:3457" + '/ideas/vote', {game: $scope.game.id, id:$scope.vote}
 			).then(function (res) {
 				$http.post(
-					"http://localhost:3457" + '/ideas/request_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
+					"http://localhost:3457" + '/ideas/decide_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
 						).then(function (res) {
-							console.log("data")
-							console.log(res.data)
-							$scope.currentWinner = res.data;
-							$scope.currentWinner.votes = res.data.popularity;
-							$scope.mode = 3;
-							$scope.question = "Winner!"
-							if($scope.currentFight == $scope.fights.length-1)
-							{
-
-								$scope.winners.push(res.data);
-							}
+							console.log("winner decided")
 						})
 			})
 	//$scope.winners.push($scope.ideas[1]);
