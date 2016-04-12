@@ -9,10 +9,11 @@ angular.module('myApp.view2', ['ngRoute'])
   });
 }])
 
-.controller('View2Ctrl', ['$scope', '$http',function($scope, $http) {
+.controller('View2Ctrl', ['$scope', '$http', '$location', 'playerID', function($scope, $http, $location, playerID) {
 	$scope.selected = 0;
 
 	$scope.room = {};
+	$scope.room.player_count = 4;
 	$scope.room.rounds = 3;
 	$scope.room.input_timer = 10;
 	$scope.room.battle_timer = 5;
@@ -25,12 +26,29 @@ angular.module('myApp.view2', ['ngRoute'])
 	$scope.createGame = function (room) {
 		console.log($scope.room.questions)
 	$http.post(
-		"http://localhost:3457" + '/games/create', {game:room}
+		"http://jackie.elrok.com" + '/games/create', {game:room}
 			)
 		.then(function (res) {
 			alert("woo")
 			})
 	
-}
+	}
+
+	$scope.joinGame = function (player) {
+		$http.post(
+		"http://jackie.elrok.com" + '/player/join', {player:player}
+			)
+		.then(function (res) {
+			if(res.data.error)
+			{
+				alert("Can't join")
+			}
+			else
+			{
+				playerID.set(res.data.player)
+				$location.path('/view1');
+			}
+			})
+	}
 
 }]);

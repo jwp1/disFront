@@ -5,7 +5,7 @@
 	</br>
 	</br>
 	<div ng-if="selected==1">
-		<form novalidate ng-submit="joinGame()" class="ui segment form">
+		<form novalidate ng-submit="joinGame(player)" class="ui segment form">
 			<div class="field">
 				<label>Player name:</label>
 				<input ng-model = "player.name" placeholder="Player name..." type="text">
@@ -31,6 +31,10 @@
 			<div class="field">
 				<label>Room name (optional):</label>
 				<input ng-model = "room.name" placeholder="Room name..." type="text">
+			</div>
+			<div class="field">
+				<label>No. of players:</label>
+				<input ng-model = "room.player_count" placeholder="Player count" type="number" min="1">
 			</div>
 			<div class="field">
 				<label>Rounds:</label>

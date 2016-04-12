@@ -1,6 +1,11 @@
 <div class="ui center aligned container">
 <h1 class="ui header">{{question}}</h1>
 	<!-- Entering Idea!-->
+	<div ng-if="mode==0">
+		<h2 class="ui header"> Please wait for game to be ready</h2>
+		 <div class="ui button" ng-click="loadGame()">Start</div>
+	</div>
+
 	<div ng-if="mode==1">
 		<form novalidate ng-submit="submitIdea()" class="ui segment form">
 			<div class="field">

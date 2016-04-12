@@ -9,7 +9,7 @@ angular.module('myApp.view1', ['ngRoute'])
   });
 }])
 
-.controller('View1Ctrl', ['$scope', '$http',function($scope, $http) {
+.controller('View1Ctrl', ['$scope', '$http', 'playerID' ,function($scope, $http, playerID) {
 
 
 $scope.questions = [];
@@ -21,7 +21,7 @@ $scope.questions = [];
 // 4 - Enter final idea
 // 5 - Vote final idea
 // 6 - Display final ideas
-$scope.mode = 1;
+$scope.mode = 0;
 $scope.idea = {};
 $scope.fights = [];
 $scope.winners = [];
@@ -30,6 +30,8 @@ $scope.currentWinner = {};
 $scope.currentRound = 0;
 $scope.rounds = 0;
 $scope.uberIdea = ""
+$scope.playerID = playerID.get();
+
 
 
 // Temp variables
@@ -40,29 +42,41 @@ $scope.uberIdeas = [];
 $scope.uberIdeas[0] = {id:0, description: "The functionality of google but with the aesthetic of yahoo",strength:2};
 
 $scope.ideaTitleSwap = function () {
-	if ($scope.questions[$scope.currentRound] != undefined)
-		$scope.question = $scope.questions[$scope.currentRound].name
+	var res = $.grep($scope.questions, function(q){ return q.round == $scope.currentRound; })
+	console.log("hhhhhhh")
+	console.log(res)
+	if (res.length == 1)
+		$scope.question = res[0].name
 	else
 		$scope.question = "Enter an idea"
 };
 
 $scope.loadGame = function () {
 	$http.post(
-		"http://localhost:3457" + '/games/show', {test: "yes"}
+		"http://jackie.elrok.com" + '/games/show', {test: "yes"}
 			)
 		.then(function (res) {
-			$scope.game = res.data.game
-			$scope.rounds = res.data.game.rounds
-			$scope.questions = res.data.questions;
-			$scope.ideaTitleSwap();
-			console.log(res.data)
+			if(res.data.error)
+				alert("Not ready")
+			else
+			{
+				$scope.game = res.data.game
+				$scope.rounds = res.data.game.rounds
+				$scope.questions = res.data.questions;
+				$scope.ideaTitleSwap();
+				console.log(res.data)
+			}
 			});
 }
 $scope.submitIdea = function() {
 	//Temp just put in array
 	$http.post(
-		"http://localhost:3457" + '/ideas/create', {"idea": $scope.idea, "game":$scope.game.id, round: $scope.currentRound}
-			);
+		"http://jackie.elrok.com" + '/ideas/create', {"idea": $scope.idea, "game":$scope.game.id, round: $scope.currentRound, player:$scope.playerID}
+			)
+		.then(function (res) {
+				if(res.data.error)
+					alert("Idea already entered")
+			});
 	console.log($scope.ideas);
 	
 	
@@ -77,7 +91,7 @@ $scope.ideaFromId = function (id_s) {
 
 $scope.requestIdeas = function () {
 	$http.post(
-		"http://localhost:3457" + '/ideas/index', {game: $scope.game.id, round: $scope.currentRound}
+		"http://jackie.elrok.com" + '/ideas/index', {game: $scope.game.id, round: $scope.currentRound}
 			)
 		.then(function (res) {
 			$scope.ideas = res.data.ideas
@@ -92,7 +106,7 @@ $scope.requestIdeas = function () {
 
 $scope.requestWinner = function () {
 	$http.post(
-		"http://localhost:3457" + '/ideas/request_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
+		"http://jackie.elrok.com" + '/ideas/request_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
 			).then(function (res) {
 				console.log("data")
 				console.log(res.data)
@@ -121,10 +135,10 @@ $scope.voteFor = function(whoId) {
 	$scope.vote = whoId;
 	console.log($scope.vote);
 	$http.post(
-		"http://localhost:3457" + '/ideas/vote', {game: $scope.game.id, id:$scope.vote}
+		"http://jackie.elrok.com" + '/ideas/vote', {game: $scope.game.id, id:$scope.vote}
 			).then(function (res) {
 				$http.post(
-					"http://localhost:3457" + '/ideas/decide_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
+					"http://jackie.elrok.com" + '/ideas/decide_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
 						).then(function (res) {
 							console.log("winner decided")
 						})
@@ -165,7 +179,7 @@ $scope.ideasUsed = function() {
 
 $scope.submitUberIdea = function(form) {
 	$http.post(
-		"http://localhost:3457" + '/ideas/destroy_all', {test: "yes"}
+		"http://jackie.elrok.com" + '/ideas/destroy_all', {test: "yes"}
 			)
 	//Temp just put in array
 	$scope.uberIdeas.push({id:1,description:form,strength:1});
@@ -178,6 +192,11 @@ $scope.appendChampion = function(champion) {
 	$('#uberIdeaBox').val($('#uberIdeaBox').val()+champion);
 }
 
-$scope.loadGame();
+if(!$scope.playerID)
+	{
+		console.log($scope.playerID)
+		$scope.question = "Error joining"
+		$scope.mode = 99
+	}
 
 }]);
