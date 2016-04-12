@@ -102,12 +102,35 @@ $scope.requestIdeas = function () {
 		"http://jackie.elrok.com" + '/ideas/index', {game: $scope.game.id, round: $scope.currentRound}
 			)
 		.then(function (res) {
-			$scope.ideas = res.data.ideas
-			$scope.mode = 2;
-			console.log($scope.ideas);
-			$scope.question = "Choose a victor"
-			$scope.fights[0] = $scope.ideas
-			$scope.currentFight = 0;
+			if(!res.data.error)
+			{
+				$scope.ideas = res.data.ideas
+				$scope.mode = 2;
+				console.log($scope.ideas);
+				$scope.question = "Choose a victor"
+				$scope.fights[0] = $scope.ideas
+				$scope.currentFight = 0;
+			}
+			else
+				alert("Too early!")
+			})
+	
+}
+
+$scope.requestUberIdeas = function () {
+	$http.post(
+		"http://jackie.elrok.com" + '/uber_ideas/index', {game: $scope.game.id, round:$scope.currentRound}
+			)
+		.then(function (res) {
+			if(!res.data.error)
+			{
+				$scope.uberIdeas = res.data.uber_ideas
+				$scope.mode = 5;
+				console.log($scope.uberIdeas);
+				$scope.question = "Choose a victor"
+			}
+			else
+				alert("Too early!")
 			})
 	
 }
@@ -123,36 +146,55 @@ $scope.voteFor = function(whoId) {
 				$scope.mode = 3;
 				$scope.question = ""
 			})
+	$scope.currentRound++
+	//$scope.winners.push($scope.ideas[1]);
+};
+
+$scope.uberVoteFor = function(whoId) {
+	//Temp just put in array
+	$scope.vote = whoId;
+	console.log($scope.vote);
+	$http.post(
+		"http://jackie.elrok.com" + '/uber_ideas/vote', {game: $scope.game.id, id:$scope.vote, player: $scope.playerID}
+			).then(function (res) {
+				$scope.mode = 8;
+				$scope.question = ""
+			})
+	$scope.currentRound++
 	//$scope.winners.push($scope.ideas[1]);
 };
 
 $scope.testNext = function() {
-	$scope.currentRound++
-	$scope.ideaTitleSwap();
-	if($scope.currentRound*1 == $scope.rounds*1)
-		$scope.mode = 1;
-	else
-		$scope.goUberRound()
+	$http.post(
+		"http://jackie.elrok.com" + '/ideas/winner_decided', {game: $scope.game.id, round: $scope.currentRound}
+			).then(function (res) {
+				if(!res.data.error)
+				{
+					$scope.ideaTitleSwap();
+					if($scope.currentRound*1 == $scope.rounds*1)
+						$scope.mode = 1;
+					else
+						$scope.goUberRound()
+				}
+				else
+					alert("Too early!")
+			})
 }
 
 $scope.goUberRound = function() {
 	$http.post(
 		"http://jackie.elrok.com" + '/ideas/request_winners', {game: $scope.game.id}
 			).then(function (res) {
-				$scope.winners = res.data.winners
+				console.log(res.data)
+				$scope.winners = res.data
 			})
 	$scope.question = "Combine the winners"
 	$scope.mode = 4;
 	$scope.currentFight++
-	if($scope.currentFight < $scope.fights.length)
-	{
-		$scope.mode = 2;
-		$scope.question = "Choose a victor"
-	}	
 }
 
 $scope.ideasUsed = function() {
-	var text = this.uberIdea.toLowerCase();
+	var text = $('#uberIdeaBox').val().toLowerCase();
 	var counter = 0;
 	for (var i = 0; i < $scope.winners.length; i++)
 		if(text.indexOf($scope.winners[i].name.toLowerCase()) != -1)
@@ -161,15 +203,13 @@ $scope.ideasUsed = function() {
 	return counter;
 }
 
-$scope.submitUberIdea = function(form) {
+$scope.submitUberIdea = function() {
 	$http.post(
-		"http://jackie.elrok.com" + '/ideas/destroy_all', {test: "yes"}
+		"http://jackie.elrok.com" + '/uber_ideas/create', {uber_idea: {description:$('#uberIdeaBox').val(), player_id: $scope.playerID}, game:$scope.game.id}
 			)
-	//Temp just put in array
-	$scope.uberIdeas.push({id:1,description:form,strength:1});
 	console.log($scope.uberIdeas);
-	$scope.mode = 5;
-	$scope.question = "Choose a final victor"
+	$scope.mode = 7;
+	$scope.question = ""
 };
 
 $scope.appendChampion = function(champion) {

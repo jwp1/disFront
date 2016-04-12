@@ -29,7 +29,7 @@ angular.module('myApp.view2', ['ngRoute'])
 		"http://jackie.elrok.com" + '/games/create', {game:room}
 			)
 		.then(function (res) {
-			alert("woo")
+			console.log("woo")
 			})
 	
 	}

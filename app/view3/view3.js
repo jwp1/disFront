@@ -92,7 +92,72 @@ angular.module('myApp.view3', ['ngRoute'])
 	$scope.goUberRound = function() {
 		console.log($scope.winners)
 		$scope.question = "Combine the winners"
-		$scope.mode = 2;
+		$scope.mode = 5;
+		$scope.currentTime = $scope.game.input_timer;
+		$('#uber_timer').html($scope.currentTime + ' second(s)');
+		var interval = setInterval(function(){
+		  $scope.currentTime--;
+		  $('#uber_timer').html($scope.currentTime + ' second(s)');
+		  if ($scope.currentTime == 0)
+			{
+				clearInterval(interval);
+				$('#uber_timer').html('');
+			     $http.post(
+				"http://jackie.elrok.com" + '/uber_ideas/index', {game: $scope.game.id, main:true, round:$scope.currentRound}
+					)
+				.then(function (res) {
+					if(res.data.error)
+		  			{
+		  				$scope.mode = 2
+		  				$scope.question = "YOU ALL SUCK AND DIDN'T SUBMIT IDEAS"
+		  				$scope.finishUberRound();
+		  			}
+		  			else
+		  			{
+		  				$scope.uberIdeas = res.data.uber_ideas
+						$scope.mode = 6;
+						$scope.question = "Choose a victor"
+						$scope.finishUberRound();
+		  			}
+					
+					});
+			}
+		}, 1000);
+	}
+
+	$scope.finishUberRound = function (){
+		$scope.currentTime = $scope.game.battle_timer;
+		$('#uber_battle_timer').html($scope.currentTime + ' second(s)');
+		var interval = setInterval(function(){
+		  $scope.currentTime--;
+		  $('#uber_battle_timer').html($scope.currentTime + ' second(s)');
+		  if ($scope.currentTime == 0)
+			{
+				clearInterval(interval);
+				$('#uber_battle_timer').html('');
+	      		$http.post(
+	      		"http://jackie.elrok.com" + '/uber_ideas/display_uber_winner', {game: $scope.game.id}
+	      			)
+	      		.then(function (res) {
+	      			if(res.data.error)
+	      			{
+	      				$scope.mode = 2
+	      				$scope.question = "YOU ALL SUCK AND DIDN'T VOTE"
+	      			}
+	      			else
+	      			{
+		      			$scope.currentWinner = res.data.winner;
+						$scope.currentWinner.votes = res.data.votes;
+						$scope.currentPlayerWinner = res.data.player;
+						$scope.players = res.data.players
+						$scope.mode = 7;
+						$scope.question = "Game over!"
+	      			}
+	      			
+	      			});
+
+	    	}
+		}, 1000);
 	}
 
 	$scope.finishRound = function (){
@@ -117,14 +182,11 @@ angular.module('myApp.view3', ['ngRoute'])
 	      			else
 	      			{
 		      			$scope.currentWinner = res.data.winner;
-						$scope.currentWinner.votes = res.data.winner.popularity;
+						$scope.currentWinner.votes = res.data.votes;
 						$scope.currentPlayerWinner = res.data.player
 						$scope.mode = 4;
 						$scope.question = "Winner!"
-						if($scope.currentFight == $scope.fights.length-1)
-						{
-							$scope.winners.push(res.data);
-						}
+						$scope.winners.push(res.data.winner);
 	      			}
 	      			
 	      			});
@@ -164,7 +226,7 @@ angular.module('myApp.view3', ['ngRoute'])
 				clearInterval(interval);
 				$('#timer').html('');
 			     $http.post(
-				"http://jackie.elrok.com" + '/ideas/index', {game: $scope.game.id, round: $scope.currentRound}
+				"http://jackie.elrok.com" + '/ideas/index', {game: $scope.game.id, round: $scope.currentRound, main:true}
 					)
 				.then(function (res) {
 					if(res.data.error)
@@ -205,7 +267,7 @@ angular.module('myApp.view3', ['ngRoute'])
 			"http://jackie.elrok.com" + '/games/create', {game:room}
 				)
 			.then(function (res) {
-				alert("woo")
+				console.log("created")
 				})
 	
 }
