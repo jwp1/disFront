@@ -29,6 +29,7 @@ angular.module('myApp.view3', ['ngRoute'])
 	$scope.rounds = 0;
 	$scope.uberIdea = ""
 	$scope.current_players = 0;
+	$scope.currentTime = 0;
 
 
 	// Temp variables
@@ -62,6 +63,16 @@ angular.module('myApp.view3', ['ngRoute'])
 			});
 	}
 
+	$scope.startGame = function () {
+		$http.post(
+			"http://jackie.elrok.com" + '/games/start', {game:$scope.game.id}
+				)
+			.then(function (res) {
+				$scope.mode = 2
+				$scope.enterIdeas();
+				})
+	}
+
 	$scope.currentPlayers = function () {
 	$http.post(
 		"http://jackie.elrok.com" + '/games/current_players', {test: "yes"}
@@ -73,19 +84,116 @@ angular.module('myApp.view3', ['ngRoute'])
 		    {
 		    	$scope.intervalFunction();
 		    }
-		    else
-		    {
-		    	$scope.mode = 2
-		    }
 			console.log(res.data)
 			});
 	}
 
+
+	$scope.goUberRound = function() {
+		console.log($scope.winners)
+		$scope.question = "Combine the winners"
+		$scope.mode = 2;
+	}
+
+	$scope.finishRound = function (){
+		$scope.currentTime = $scope.game.battle_timer;
+		$('#battle_timer').html($scope.currentTime + ' second(s)');
+		var interval = setInterval(function(){
+		  $scope.currentTime--;
+		  $('#battle_timer').html($scope.currentTime + ' second(s)');
+		  if ($scope.currentTime == 0)
+			{
+				clearInterval(interval);
+				$('#battle_timer').html('');
+	      		$http.post(
+	      		"http://jackie.elrok.com" + '/ideas/display_winner', {game: $scope.game.id, round:$scope.currentRound}
+	      			)
+	      		.then(function (res) {
+	      			if(res.data.error)
+	      			{
+	      				$scope.mode = 2
+	      				$scope.question = "YOU ALL SUCK AND DIDN'T VOTE"
+	      			}
+	      			else
+	      			{
+		      			$scope.currentWinner = res.data.winner;
+						$scope.currentWinner.votes = res.data.winner.popularity;
+						$scope.currentPlayerWinner = res.data.player
+						$scope.mode = 4;
+						$scope.question = "Winner!"
+						if($scope.currentFight == $scope.fights.length-1)
+						{
+							$scope.winners.push(res.data);
+						}
+	      			}
+	      			
+	      			});
+	      		$timeout(function() {
+	      			$http.post(
+					"http://jackie.elrok.com" + '/ideas/decide_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
+						).then(function (res) {
+							console.log("winner decided")
+						})
+		      		$scope.currentRound++
+		      		$scope.ideaTitleSwap();
+		      		if($scope.currentRound*1 == $scope.rounds*1)
+		      		{
+		      			$scope.mode = 2;
+		      			$scope.enterIdeas();
+		      		}
+		      		else
+		      			$scope.goUberRound()
+		      	}, 3000)
+
+	    	}
+		}, 1000);
+	}
+
+	$scope.getTime = function (){
+		return $scope.currentTime;
+	}
+
+	$scope.enterIdeas = function (){
+		$scope.currentTime = $scope.game.input_timer;
+		$('#timer').html($scope.currentTime + ' second(s)');
+		var interval = setInterval(function(){
+		  $scope.currentTime--;
+		  $('#timer').html($scope.currentTime + ' second(s)');
+		  if ($scope.currentTime == 0)
+			{
+				clearInterval(interval);
+				$('#timer').html('');
+			     $http.post(
+				"http://jackie.elrok.com" + '/ideas/index', {game: $scope.game.id, round: $scope.currentRound}
+					)
+				.then(function (res) {
+					if(res.data.error)
+		  			{
+		  				$scope.mode = 2
+		  				$scope.question = "YOU ALL SUCK AND DIDN'T SUBMIT IDEAS"
+		  				$scope.finishRound();
+		  			}
+		  			else
+		  			{
+		  				$scope.ideas = res.data.ideas
+						$scope.mode = 3;
+						console.log($scope.ideas);
+						$scope.question = "Choose a victor"
+						$scope.fights[0] = $scope.ideas
+						$scope.currentFight = 0;
+						$scope.finishRound();
+		  			}
+					
+					});
+			}
+		}, 1000);
+	}
+
 	$scope.intervalFunction = function(){
-    $timeout(function() {
-      $scope.currentPlayers();
-    }, 5000)
-  };
+	    $timeout(function() {
+	      $scope.currentPlayers();
+	    }, 5000)
+  	};
 
 	$scope.genArray = function(num) {
     	return new Array(num);   

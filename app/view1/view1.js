@@ -27,7 +27,7 @@ $scope.fights = [];
 $scope.winners = [];
 $scope.currentFight = [];
 $scope.currentWinner = {};
-$scope.currentRound = 0;
+$scope.currentRound = 1;
 $scope.rounds = 0;
 $scope.uberIdea = ""
 $scope.playerID = playerID.get();
@@ -64,6 +64,7 @@ $scope.loadGame = function () {
 				$scope.rounds = res.data.game.rounds
 				$scope.questions = res.data.questions;
 				$scope.ideaTitleSwap();
+				$scope.mode=1
 				console.log(res.data)
 			}
 			});
@@ -76,6 +77,12 @@ $scope.submitIdea = function() {
 		.then(function (res) {
 				if(res.data.error)
 					alert("Idea already entered")
+				else
+					{
+						$scope.mode = 6
+						$scope.question = ""
+					}
+
 			});
 	console.log($scope.ideas);
 	
@@ -88,6 +95,7 @@ $scope.ideaFromId = function (id_s) {
 	    if($scope.ideas[i].id==id_s) 
 	        return $scope.ideas[i]
 }
+
 
 $scope.requestIdeas = function () {
 	$http.post(
@@ -104,44 +112,16 @@ $scope.requestIdeas = function () {
 	
 }
 
-$scope.requestWinner = function () {
-	$http.post(
-		"http://jackie.elrok.com" + '/ideas/request_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
-			).then(function (res) {
-				console.log("data")
-				console.log(res.data)
-				if(!res.data.error)
-				{
-					$scope.currentWinner = res.data;
-					$scope.currentWinner.votes = res.data.popularity;
-					$scope.mode = 3;
-					$scope.question = "Winner!"
-					if($scope.currentFight == $scope.fights.length-1)
-					{
-
-						$scope.winners.push(res.data);
-					}
-				}
-				else
-				{
-					alert("Winner not yet decided")
-				}
-			})
-}
-
 $scope.voteFor = function(whoId) {
 	//Temp just put in array
 	
 	$scope.vote = whoId;
 	console.log($scope.vote);
 	$http.post(
-		"http://jackie.elrok.com" + '/ideas/vote', {game: $scope.game.id, id:$scope.vote}
+		"http://jackie.elrok.com" + '/ideas/vote', {game: $scope.game.id, id:$scope.vote, player: $scope.playerID}
 			).then(function (res) {
-				$http.post(
-					"http://jackie.elrok.com" + '/ideas/decide_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
-						).then(function (res) {
-							console.log("winner decided")
-						})
+				$scope.mode = 3;
+				$scope.question = ""
 			})
 	//$scope.winners.push($scope.ideas[1]);
 };
@@ -149,14 +129,18 @@ $scope.voteFor = function(whoId) {
 $scope.testNext = function() {
 	$scope.currentRound++
 	$scope.ideaTitleSwap();
-	if($scope.currentRound != $scope.rounds)
+	if($scope.currentRound*1 == $scope.rounds*1)
 		$scope.mode = 1;
 	else
 		$scope.goUberRound()
 }
 
 $scope.goUberRound = function() {
-	console.log($scope.winners)
+	$http.post(
+		"http://jackie.elrok.com" + '/ideas/request_winners', {game: $scope.game.id}
+			).then(function (res) {
+				$scope.winners = res.data.winners
+			})
 	$scope.question = "Combine the winners"
 	$scope.mode = 4;
 	$scope.currentFight++

@@ -18,8 +18,13 @@
 				<textarea ng-model = "idea.description" rows="3"></textarea>
 			</div>
 			 <button class="ui button" type="submit">Submit</button>
-			 <div class="ui button" ng-click="requestIdeas()">Submit</div>
 		</form>
+	</div>
+
+		<!-- Winner!-->
+	<div ng-if="mode==6">
+		<h2 class="ui header"> Please wait for game to be ready</h2>
+		<div class="ui button" ng-click="requestIdeas()">Next</div>
 	</div>
 
 	<!-- Fighting!-->
@@ -37,25 +42,13 @@
 			</div>
 			<span ng-if="$index != fights[currentFight].length-1">VS</br></br></span>
 		</div>
-		<div class="ui button" ng-click="requestWinner()">Next</div>
+		</br>
 	</div>
 
 	<!-- Winner!-->
 	<div ng-if="mode==3">
-		<div class="ui form segment">
-			<div class="inline field">
-				<label>Name:</label>
-				{{currentWinner.name}}
-			</div>
-			<div class="inline field">
-				<label>Description:</label>
-				{{currentWinner.description}}
-			</div>
-			<div ng-click = "testNext()" class="inline field">
-				<label>Votes:</label>
-				{{currentWinner.votes}}
-			</div>
-		</div>
+		<h2 class="ui header"> Please wait for game to be ready</h2>
+		<div class="ui button" ng-click="testNext()">Next</div>
 	</div>
 
 	<!-- Enter big idea!-->
