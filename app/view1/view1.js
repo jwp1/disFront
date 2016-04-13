@@ -143,10 +143,21 @@ $scope.voteFor = function(whoId) {
 	$http.post(
 		"http://jackie.elrok.com" + '/ideas/vote', {game: $scope.game.id, id:$scope.vote, player: $scope.playerID}
 			).then(function (res) {
-				$scope.mode = 3;
-				$scope.question = ""
+				if(res.data.error == 0)
+				{
+					$scope.mode = 3;
+					$scope.question = ""
+					$scope.currentRound++
+				}
+				else if(res.data.error == 1)
+					alert("Can't vote for yourself")
+				else
+					{
+						$scope.mode = 3;
+						$scope.question = ""
+						$scope.currentRound++
+					}
 			})
-	$scope.currentRound++
 	//$scope.winners.push($scope.ideas[1]);
 };
 
@@ -157,8 +168,20 @@ $scope.uberVoteFor = function(whoId) {
 	$http.post(
 		"http://jackie.elrok.com" + '/uber_ideas/vote', {game: $scope.game.id, id:$scope.vote, player: $scope.playerID}
 			).then(function (res) {
-				$scope.mode = 8;
-				$scope.question = ""
+				if(res.data.error == 0)
+				{
+					$scope.mode = 8;
+					$scope.question = ""
+					$scope.currentRound++
+				}
+				else if(res.data.error == 1)
+					alert("Can't vote for yourself")
+				else
+					{
+						$scope.mode = 3;
+						$scope.question = ""
+						$scope.currentRound++
+					}
 			})
 	$scope.currentRound++
 	//$scope.winners.push($scope.ideas[1]);
