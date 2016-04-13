@@ -198,7 +198,7 @@ angular.module('myApp.view3', ['ngRoute'])
 						})
 		      		$scope.currentRound++
 		      		$scope.ideaTitleSwap();
-		      		if($scope.currentRound*1 == $scope.rounds*1)
+		      		if($scope.currentRound*1 <= $scope.rounds*1)
 		      		{
 		      			$scope.mode = 2;
 		      			$scope.enterIdeas();

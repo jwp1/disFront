@@ -194,7 +194,7 @@ $scope.testNext = function() {
 				if(!res.data.error)
 				{
 					$scope.ideaTitleSwap();
-					if($scope.currentRound*1 == $scope.rounds*1)
+					if($scope.currentRound*1 <= $scope.rounds*1)
 						$scope.mode = 1;
 					else
 						$scope.goUberRound()
