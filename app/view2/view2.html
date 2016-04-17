@@ -1,14 +1,16 @@
 <div class="ui center aligned container">
-<h1 class="ui header">Welcome to Brainstrom</h1>
-	<div class="ui button" ng-class="selected == 1 && 'grey' || ''" ng-click="selected = 1">Join a game</div> 
-	<div class="ui button" ng-class="selected == 2 && 'grey' || ''" ng-click="selected = 2">Start a new game</div>
+<h1 class="ui yellow header">Welcome to Brainstrom</h1>
+	<div class="ui button" ng-class="selected == 1 && 'active' || ''" ng-click="selected = 1">Join a game</div> 
+	<div class="ui button" ng-class="selected == 2 && 'active' || ''" ng-click="selected = 2">Start a new game</div>
 	</br>
 	</br>
 	<div ng-if="selected==1">
 		<form novalidate ng-submit="joinGame(player)" class="ui segment form">
 			<div class="field">
 				<label>Player name:</label>
-				<input ng-model = "player.name" placeholder="Player name..." type="text">
+				<div class="loading">
+					<input ng-model = "player.name" placeholder="Player name..." type="text">
+				</div>
 			</div>
 			<div class="field">
 				<label>Room code:</label>

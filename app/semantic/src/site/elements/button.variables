@@ -1,3 +1,137 @@
 /*******************************
     User Variable Overrides
 *******************************/
+/*-------------------
+       Element
+--------------------*/
+
+/* Button */
+@verticalMargin: 0em;
+@horizontalMargin: 0.25em;
+@backgroundColor: #dac044;
+@backgroundImage: none;
+@background: @backgroundColor @backgroundImage;
+@lineHeight: 1em;
+
+/* Button defaults to using same height as input globally */
+@verticalPadding: @inputVerticalPadding;
+@horizontalPadding: 1.5em;
+
+/* Text */
+@textTransform: none;
+@tapColor: transparent;
+@fontFamily: @pageFont;
+@fontWeight: bold;
+@textColor: rgba(0, 0, 0, 0.6);
+@textShadow: none;
+@invertedTextShadow: @textShadow;
+@borderRadius: @defaultBorderRadius;
+@verticalAlign: baseline;
+
+/* Internal Shadow */
+@shadowDistance: 0em;
+@shadowOffset: (@shadowDistance / 2);
+@shadowBoxShadow: 0px -@shadowDistance 0px 0px @borderColor inset;
+
+/* Box Shadow */
+@borderBoxShadowColor: transparent;
+@borderBoxShadowWidth: 1px;
+@borderBoxShadow: 0px 0px 0px @borderBoxShadowWidth @borderBoxShadowColor inset;
+@boxShadow:
+  @borderBoxShadow,
+  @shadowBoxShadow
+;
+/*-------------------
+        Group
+--------------------*/
+
+@groupBoxShadow: none;
+@groupButtonBoxShadow: @boxShadow;
+@verticalBoxShadow: none;
+@groupButtonOffset: 0px 0px 0px 0px;
+@verticalGroupOffset: 0px 0px 0px 0px;
+
+/*-------------------
+        States
+--------------------*/
+
+/* Hovered */
+@hoverBackgroundColor: #ffdf4c;
+@hoverBackgroundImage: @backgroundImage;
+@hoverBoxShadow: @boxShadow;
+@hoverColor: @hoveredTextColor;
+@iconHoverOpacity: 0.85;
+
+/* Focused */
+@focusBackgroundColor: @hoverBackgroundColor;
+@focusBackgroundImage: '';
+@focusBoxShadow: '';
+@focusColor: @hoveredTextColor;
+@iconFocusOpacity: 0.85;
+
+/* Pressed Down */
+@downBackgroundColor: #ac7f00;
+@downBackgroundImage: '';
+@downPressedShadow: none;
+@downBoxShadow:
+  @borderBoxShadow,
+  @downPressedShadow
+;
+@downColor: @pressedTextColor;
+
+/* Active */
+@activeBackgroundColor: #ac7f00;
+@activeBackgroundImage: none;
+@activeColor: @selectedTextColor;
+@activeBoxShadow: @borderBoxShadow;
+
+/* Active + Hovered */
+@activeHoverBackgroundColor: @activeBackgroundColor;
+@activeHoverBackgroundImage: none;
+@activeHoverColor: @activeColor;
+@activeHoverBoxShadow: @activeBoxShadow;
+
+/* Loading */
+@loadingOpacity: 1;
+@loadingPointerEvents: auto;
+@loadingTransition:
+  all 0s linear,
+  opacity @defaultDuration @defaultEasing
+;
+
+
+/*-------------------
+      Variations
+--------------------*/
+
+/* Colors */
+@coloredBackgroundImage: none;
+@coloredBoxShadow: @shadowBoxShadow;
+
+/* Colored */
+@brownTextColor: @invertedTextColor;
+@brownTextShadow: @invertedTextShadow;
+@redTextColor: @invertedTextColor;
+@redTextShadow: @invertedTextShadow;
+@orangeTextColor: @invertedTextColor;
+@orangeTextShadow: @invertedTextShadow;
+@greenTextColor: @invertedTextColor;
+@greenTextShadow: @invertedTextShadow;
+@blueTextColor: @invertedTextColor;
+@blueTextShadow: @invertedTextShadow;
+@violetTextColor: @invertedTextColor;
+@violetTextShadow: @invertedTextShadow;
+@purpleTextColor: @invertedTextColor;
+@purpleTextShadow: @invertedTextShadow;
+@pinkTextColor: @invertedTextColor;
+@pinkTextShadow: @invertedTextShadow;
+@blackTextColor: @invertedTextColor;
+@blackTextShadow: @invertedTextShadow;
+@oliveTextColor: @invertedTextColor;
+@oliveTextShadow: @invertedTextShadow;
+@yellowTextColor: @invertedTextColor;
+@yellowTextShadow: @invertedTextShadow;
+@tealTextColor: @invertedTextColor;
+@tealTextShadow: @invertedTextShadow;
+@greyTextColor: @invertedTextColor;
+@greyTextShadow: @invertedTextShadow;

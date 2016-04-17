@@ -1,12 +1,15 @@
 <div class="ui center aligned container">
 	<div ng-if = "mode == 1">
 		<h1 class="bigtext">Waiting for players...</h1>
-		<h1 class="ui header">{{current_players}} / {{game.player_count}}</h1>
+		<h1 class="ui yellow header">{{current_players}} / {{game.player_count}}</h1>
 		<div class="ui button" ng-if="current_players == game.player_count" ng-click="startGame()">Start</div>
 	</div>
 	<div ng-if = "mode == 2">
 		<h1 class="bigtext">{{question}}</h1>
-		<h1 class="ui header" id="timer"></h1>
+		<h1 class="ui yellow header" id="timer">{{game.input_timer}} second(s)</h1>
+		<div class="ui button" ng-class="decrement == 1 && 'active' || ''" ng-click="setDec(1)">Start</div> 
+		<div class="ui button" ng-class="decrement == 0 && 'active' || ''" ng-click="setDec(0)">Pause</div> 
+		<div class="ui button" ng-click="setDec(-1)">Next</div> 
 	</div>
 	<div ng-if = "mode == 3">
 		<h1 class="bigtext">{{question}}</h1>
@@ -21,9 +24,12 @@
 					{{fighter.description}}
 				</div>
 			</div>
-			<span ng-if="$index != fights[currentFight].length-1">VS</br></br></span>
+		</br>
 		</div>
-		<h1 class="ui header" id="battle_timer"></h1>
+		<h1 class="ui yellow header" id="battle_timer">{{game.battle_timer}} second(s)</h1>
+		<div class="ui button" ng-class="decrement == 1 && 'active' || ''" ng-click="setDec(1)">Start</div> 
+		<div class="ui button" ng-class="decrement == 0 && 'active' || ''" ng-click="setDec(0)">Pause</div> 
+		<div class="ui button" ng-click="setDec(-1)">Next</div> 
 	</div>
 	<div ng-if="mode==4">
 		<h1 class="bigtext">{{question}}</h1>
@@ -64,7 +70,10 @@
 				</div>
 			</div>
 		</div>
-		<h1 class="ui header" id="uber_timer"></h1>
+		<h1 class="ui yellow header" id="uber_timer">{{game.input_timer}} second(s)</h1>
+		<div class="ui button" ng-class="decrement == 1 && 'active' || ''" ng-click="setDec(1)">Start</div> 
+		<div class="ui button" ng-class="decrement == 0 && 'active' || ''" ng-click="setDec(0)">Pause</div> 
+		<div class="ui button" ng-click="setDec(-1)">Next</div> 
 	</div>
 	<div ng-if = "mode == 6">
 		<h1 class="bigtext">{{question}}</h1>
@@ -79,10 +88,14 @@
 					{{uber.description}}
 				</div>
 			</div>
-			<span ng-if="$index%2==0">VS</br></br></span>
+			</br>
 		</div>
-		<h1 class="ui header" id="uber_battle_timer"></h1>
+		<h1 class="ui yellow header" id="uber_battle_timer">{{game.battle_timer}} second(s)</h1>
+		<div class="ui button" ng-class="decrement == 1 && 'active' || ''" ng-click="setDec(1)">Start</div> 
+		<div class="ui button" ng-class="decrement == 0 && 'active' || ''" ng-click="setDec(0)">Pause</div> 
+		<div class="ui button" ng-click="setDec(-1)">Next</div> 
 	</div>
+
 	<div ng-if = "mode == 7">
 		<h1 class="bigtext">{{question}}</h1>
 		<h1 class="bigtext">Winner</h1>
@@ -116,6 +129,9 @@
 				</div>
 			</div>
 		</div>
+	</div>
+	<div ng-if = "mode == 8">
+		<h1 class="bigtext">{{question}}</h1>
 	</div>
 
 

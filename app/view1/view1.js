@@ -9,7 +9,7 @@ angular.module('myApp.view1', ['ngRoute'])
   });
 }])
 
-.controller('View1Ctrl', ['$scope', '$http', 'playerID' ,function($scope, $http, playerID) {
+.controller('View1Ctrl', ['$scope', '$http', 'playerID', '$location' ,function($scope, $http, playerID, $location) {
 
 
 $scope.questions = [];
@@ -75,13 +75,20 @@ $scope.submitIdea = function() {
 		"http://jackie.elrok.com" + '/ideas/create', {"idea": $scope.idea, "game":$scope.game.id, round: $scope.currentRound, player:$scope.playerID}
 			)
 		.then(function (res) {
-				if(res.data.error)
+				if(res.data.error == 1)
 					alert("Idea already entered")
+				else if(res.data.error == 2)
+				{
+					alert("Too slow!")
+					$scope.idea = {};
+					$scope.requestIdeas();
+				}
 				else
-					{
-						$scope.mode = 6
-						$scope.question = ""
-					}
+				{
+					$scope.idea = {};
+					$scope.mode = 6
+					$scope.question = ""
+				}
 
 			});
 	console.log($scope.ideas);
@@ -239,11 +246,29 @@ $scope.appendChampion = function(champion) {
 	$('#uberIdeaBox').val($('#uberIdeaBox').val()+champion);
 }
 
+$scope.refreshGame = function(game_details) {
+	$scope.currentRound = game_details.round
+	if(game_details.game_over)
+	{
+		$scope.mode = 8;
+	}
+	else if(game_details.voting_over)
+	{
+		$scope.testNext();
+	}
+	else
+	{
+		$scope.requestIdeas();
+	}
+
+}
+
 if(!$scope.playerID)
 	{
 		console.log($scope.playerID)
 		$scope.question = "Error joining"
 		$scope.mode = 99
+		$location.path('/view2');
 	}
 
 }]);

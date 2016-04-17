@@ -1,17 +1,17 @@
 <div class="ui center aligned container">
-<h1 class="ui header">{{question}}</h1>
-	<!-- Entering Idea!-->
+<h1 class="ui yellow header">{{question}}</h1>
+	<!-- Waiting for game to start-->
 	<div ng-if="mode==0">
-		<h2 class="ui header"> Please wait for game to be ready</h2>
+		<h2 class="ui yellow header"> Please wait for game to be ready</h2>
 		 <div class="ui button" ng-click="loadGame()">Start</div>
 	</div>
 
+	<!-- Entering Idea! votingover=true-->
 	<div ng-if="mode==1">
 		<form novalidate ng-submit="submitIdea()" class="ui segment form">
 			<div class="field">
 				<label>Name:</label>
 				<input ng-model = "idea.name" placeholder="Idea name..." type="text">
-				
 			</div>
 			<div class="field">
 				<label>Description:</label>
@@ -22,11 +22,11 @@
 	</div>
 
 	<div ng-if="mode==6">
-		<h2 class="ui header"> Please wait for game to be ready</h2>
+		<h2 class="ui yellow header"> Please wait for game to be ready</h2>
 		<div class="ui button" ng-click="requestIdeas()">Next</div>
 	</div>
 
-	<!-- Fighting!-->
+	<!-- Fighting! votingover=false-->
 	<div ng-if="mode==2">
 		<div ng-repeat="fighter in fights[currentFight] track by $index">
 			<div ng-click="voteFor(fighter.id)" class="ui form segment">
@@ -39,14 +39,14 @@
 					{{fighter.description}}
 				</div>
 			</div>
-			<span ng-if="$index != fights[currentFight].length-1">VS</br></br></span>
+			</br>
 		</div>
 		</br>
 	</div>
 
 	<!-- Winner!-->
 	<div ng-if="mode==3">
-		<h2 class="ui header"> Please wait for game to be ready</h2>
+		<h2 class="ui yellow header"> Please wait for game to be ready</h2>
 		<div class="ui button" ng-click="testNext()">Next</div>
 	</div>
 
@@ -70,7 +70,7 @@
 	</div>
 
 	<div ng-if="mode==7">
-		<h2 class="ui header"> Please wait for game to be ready</h2>
+		<h2 class="ui yellow header"> Please wait for game to be ready</h2>
 		<div class="ui button" ng-click="requestUberIdeas()">Next</div>
 	</div>
 
@@ -86,12 +86,12 @@
 					{{uber.description}}
 				</div>
 			</div>
-			<span ng-if="$index%2==0">VS</br></br></span>
+			</br>
 		</div>
 	</div>
 
 	<div ng-if="mode==8">
-		<h2 class="ui header"> Game over :)</h2>
+		<h2 class="ui yellow header"> Game over :)</h2>
 	</div>
 
 
