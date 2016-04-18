@@ -11,10 +11,9 @@ angular.module('myApp.view2', ['ngRoute'])
 
 .controller('View2Ctrl', ['$scope', '$http', '$location', 'playerID', function($scope, $http, $location, playerID) {
 	$scope.selected = 0;
-
 	$scope.room = {};
-	$scope.room.player_count = 4;
-	$scope.room.rounds = 3;
+	$scope.room.player_count = 1;
+	$scope.room.rounds = 1;
 	$scope.room.input_timer = 10;
 	$scope.room.battle_timer = 5;
 	$scope.room.questions = {};
@@ -25,11 +24,12 @@ angular.module('myApp.view2', ['ngRoute'])
 
 	$scope.createGame = function (room) {
 		console.log($scope.room.questions)
-	$http.post(
+		$http.post(
 		"http://jackie.elrok.com" + '/games/create', {game:room}
 			)
 		.then(function (res) {
 			console.log("woo")
+			
 			})
 	
 	}

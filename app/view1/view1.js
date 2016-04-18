@@ -9,7 +9,7 @@ angular.module('myApp.view1', ['ngRoute'])
   });
 }])
 
-.controller('View1Ctrl', ['$scope', '$http', 'playerID', '$location' ,function($scope, $http, playerID, $location) {
+.controller('View1Ctrl', ['$scope', '$http', 'playerID', '$location', '$timeout',function($scope, $http, playerID, $location, $timeout) {
 
 
 $scope.questions = [];
@@ -28,19 +28,57 @@ $scope.winners = [];
 $scope.currentFight = [];
 $scope.currentWinner = {};
 $scope.currentRound = 1;
+$scope.decrement = 1;
 $scope.rounds = 0;
 $scope.uberIdea = ""
 $scope.playerID = playerID.get();
-
+$scope.phase = 0;
+var dispatcher = new WebSocketRails('jackie.elrok.com/websocket');
+var channel = dispatcher.subscribe('sockets');
+channel.bind('next', function() {
+  $scope.nextPhase();
+});
 
 
 // Temp variables
 $scope.ideas = [];
-$scope.ideas[0] = {name: "Google", description: "A search engine"};
-$scope.ideas[1] = {name: "Yahoo", description: "Another search engine"};
 $scope.uberIdeas = [];
-$scope.uberIdeas[0] = {id:0, description: "The functionality of google but with the aesthetic of yahoo",strength:2};
 
+
+$scope.nextPhase = function () {
+	console.log("Next")
+	switch($scope.phase) {
+    case 0:
+        $scope.loadGame();
+        $scope.phase = 1;
+        break;
+    case 1:
+        $scope.requestIdeas();
+        $scope.phase = 2;
+        $scope.$apply();
+        break;
+    case 2:
+	    $scope.mode = 9;
+	    $scope.$apply();
+    	$scope.currentRound++
+    	$scope.nextRound();
+    	$scope.$apply();
+    	break;
+    case 3:
+    	$scope.currentRound++
+    	$scope.requestUberIdeas();
+    	$scope.phase = 4;
+    	$scope.$apply();
+    	break;
+    case 4:
+    	$scope.mode = 8;
+    	$scope.$apply();
+    	break;
+    default:
+        break;
+}
+
+}
 $scope.ideaTitleSwap = function () {
 	var res = $.grep($scope.questions, function(q){ return q.round == $scope.currentRound; })
 	console.log("hhhhhhh")
@@ -61,10 +99,21 @@ $scope.loadGame = function () {
 			else
 			{
 				$scope.game = res.data.game
+				$scope.input_timer = res.data.game.input_timer
+				$scope.battle_timer = res.data.game.battle_timer
 				$scope.rounds = res.data.game.rounds
 				$scope.questions = res.data.questions;
 				$scope.ideaTitleSwap();
 				$scope.mode=1
+		        $scope.currentTime = $scope.game.input_timer-1;
+				$('#timer').html($scope.currentTime + ' second(s)');
+				var interval = setInterval(function()
+				{ 
+				  $scope.currentTime = $scope.currentTime-$scope.decrement;
+				  $('#timer').html($scope.currentTime + ' second(s)');
+				  if ($scope.currentTime <= 0)
+						clearInterval(interval);
+				}, 1000);
 				console.log(res.data)
 			}
 			});
@@ -75,20 +124,9 @@ $scope.submitIdea = function() {
 		"http://jackie.elrok.com" + '/ideas/create', {"idea": $scope.idea, "game":$scope.game.id, round: $scope.currentRound, player:$scope.playerID}
 			)
 		.then(function (res) {
-				if(res.data.error == 1)
-					alert("Idea already entered")
-				else if(res.data.error == 2)
-				{
-					alert("Too slow!")
-					$scope.idea = {};
-					$scope.requestIdeas();
-				}
-				else
-				{
-					$scope.idea = {};
-					$scope.mode = 6
-					$scope.question = ""
-				}
+				$scope.idea = {};
+				$scope.mode = 6
+				$scope.question = ""
 
 			});
 	console.log($scope.ideas);
@@ -117,9 +155,18 @@ $scope.requestIdeas = function () {
 				$scope.question = "Choose a victor"
 				$scope.fights[0] = $scope.ideas
 				$scope.currentFight = 0;
+				$scope.currentTime = $scope.game.battle_timer-1;
+				$('#battle_timer').html($scope.currentTime + ' second(s)');
+				var interval = setInterval(function()
+				{ 
+				  $scope.currentTime = $scope.currentTime-$scope.decrement;
+				  $('#battle_timer').html($scope.currentTime + ' second(s)');
+				  if ($scope.currentTime <= 0)
+						clearInterval(interval);
+				}, 1000);
 			}
 			else
-				alert("Too early!")
+				$scope.mode = 10;
 			})
 	
 }
@@ -135,6 +182,15 @@ $scope.requestUberIdeas = function () {
 				$scope.mode = 5;
 				console.log($scope.uberIdeas);
 				$scope.question = "Choose a victor"
+				$scope.currentTime = $scope.game.battle_timer-1;
+				$('#uber_battle_timer').html($scope.currentTime + ' second(s)');
+				var interval = setInterval(function()
+				{ 
+				  $scope.currentTime = $scope.currentTime-$scope.decrement;
+				  $('#uber_battle_timer').html($scope.currentTime + ' second(s)');
+				  if ($scope.currentTime <= 0)
+						clearInterval(interval);
+				}, 1000);
 			}
 			else
 				alert("Too early!")
@@ -194,24 +250,30 @@ $scope.uberVoteFor = function(whoId) {
 	//$scope.winners.push($scope.ideas[1]);
 };
 
-$scope.testNext = function() {
-	$http.post(
-		"http://jackie.elrok.com" + '/ideas/winner_decided', {game: $scope.game.id, round: $scope.currentRound}
-			).then(function (res) {
-				if(!res.data.error)
-				{
-					$scope.ideaTitleSwap();
-					if($scope.currentRound*1 <= $scope.rounds*1)
-						$scope.mode = 1;
-					else
-						$scope.goUberRound()
-				}
-				else
-					alert("Too early!")
-			})
+$scope.nextRound = function() {
+$timeout(function() {
+		$scope.ideaTitleSwap();
+		if($scope.currentRound*1 <= $scope.rounds*1)
+			{
+				$scope.mode = 1;
+				$scope.phase = 1;
+				$scope.currentTime = $scope.game.input_timer-1;
+				$('#timer').html($scope.currentTime + ' second(s)');
+				var interval = setInterval(function()
+				{ 
+				  $scope.currentTime = $scope.currentTime-$scope.decrement;
+				  $('#timer').html($scope.currentTime + ' second(s)');
+				  if ($scope.currentTime <= 0)
+						clearInterval(interval);
+				}, 1000);
+			}
+		else
+			$scope.goUberRound()
+	}, 6000)
 }
 
 $scope.goUberRound = function() {
+	$scope.phase = 3;
 	$http.post(
 		"http://jackie.elrok.com" + '/ideas/request_winners', {game: $scope.game.id}
 			).then(function (res) {
@@ -221,6 +283,15 @@ $scope.goUberRound = function() {
 	$scope.question = "Combine the winners"
 	$scope.mode = 4;
 	$scope.currentFight++
+	$scope.currentTime = $scope.game.input_timer-1;
+				$('#uber_timer').html($scope.currentTime + ' second(s)');
+				var interval = setInterval(function()
+				{ 
+				  $scope.currentTime = $scope.currentTime-$scope.decrement;
+				  $('#uber_timer').html($scope.currentTime + ' second(s)');
+				  if ($scope.currentTime <= 0	)
+						clearInterval(interval);
+				}, 1000);
 }
 
 $scope.ideasUsed = function() {
@@ -254,7 +325,7 @@ $scope.refreshGame = function(game_details) {
 	}
 	else if(game_details.voting_over)
 	{
-		$scope.testNext();
+		$scope.nextRound;
 	}
 	else
 	{
