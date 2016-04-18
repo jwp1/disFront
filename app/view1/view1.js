@@ -33,11 +33,11 @@ $scope.rounds = 0;
 $scope.uberIdea = ""
 $scope.playerID = playerID.get();
 $scope.phase = 0;
-var dispatcher = new WebSocketRails('jackie.elrok.com/websocket');
-var channel = dispatcher.subscribe('sockets');
-channel.bind('next', function() {
-  $scope.nextPhase();
-});
+// var dispatcher = new WebSocketRails('jackie.elrok.com/websocket');
+// var channel = dispatcher.subscribe('sockets');
+// channel.bind('next', function() {
+//   $scope.nextPhase();
+// });
 
 
 // Temp variables
@@ -125,7 +125,7 @@ $scope.submitIdea = function() {
 			)
 		.then(function (res) {
 				$scope.idea = {};
-				$scope.mode = 6
+				$scope.mode = 0
 				$scope.question = ""
 
 			});
@@ -208,7 +208,7 @@ $scope.voteFor = function(whoId) {
 			).then(function (res) {
 				if(res.data.error == 0)
 				{
-					$scope.mode = 3;
+					$scope.mode = 0;
 					$scope.question = ""
 					$scope.currentRound++
 				}
@@ -216,7 +216,7 @@ $scope.voteFor = function(whoId) {
 					alert("Can't vote for yourself")
 				else
 					{
-						$scope.mode = 3;
+						$scope.mode = 0;
 						$scope.question = ""
 						$scope.currentRound++
 					}
@@ -241,7 +241,7 @@ $scope.uberVoteFor = function(whoId) {
 					alert("Can't vote for yourself")
 				else
 					{
-						$scope.mode = 3;
+						$scope.mode = 0;
 						$scope.question = ""
 						$scope.currentRound++
 					}
@@ -309,7 +309,7 @@ $scope.submitUberIdea = function() {
 		"http://jackie.elrok.com" + '/uber_ideas/create', {uber_idea: {description:$('#uberIdeaBox').val(), player_id: $scope.playerID}, game:$scope.game.id}
 			)
 	console.log($scope.uberIdeas);
-	$scope.mode = 7;
+	$scope.mode = 0;
 	$scope.question = ""
 };
 

@@ -28,7 +28,8 @@ angular.module('myApp.view2', ['ngRoute'])
 		"http://jackie.elrok.com" + '/games/create', {game:room}
 			)
 		.then(function (res) {
-			console.log("woo")
+			if(res.data.error)
+				alert("Error creating game")
 			
 			})
 	
@@ -41,7 +42,7 @@ angular.module('myApp.view2', ['ngRoute'])
 		.then(function (res) {
 			if(res.data.error)
 			{
-				alert("Can't join")
+				alert("Can't join, game full/started or no name entered")
 			}
 			else
 			{

@@ -1,5 +1,5 @@
 <div class="ui center aligned container">
-<h1 class="ui yellow header">{{question}}</h1>
+<h1 class="ui yellow header">{{question}}</h1><div class="ui button" ng-click = "nextPhase()">Next</div>
 	<!-- Waiting for game to start-->
 	<div ng-if="mode==0">
 		<h2 class="ui yellow header"> Please wait for game to be ready</h2>
@@ -7,10 +7,10 @@
 
 	<!-- Entering Idea! votingover=true-->
 	<div ng-if="mode==1">
-		<form novalidate ng-submit="submitIdea()" class="ui segment form">
+		<form ng-submit="submitIdea()" class="ui segment form">
 			<div class="field">
 				<label>Name:</label>
-				<input ng-model = "idea.name" placeholder="Idea name..." type="text">
+				<input ng-model = "idea.name" placeholder="Idea name..." type="text" required>
 			</div>
 			<div class="field">
 				<label>Description:</label>
@@ -19,10 +19,6 @@
 			 <button class="ui button" type="submit">Submit</button>
 		</form>
 		<h1 class="ui yellow header" id="timer">{{game.input_timer-1}} second(s)</h1>
-	</div>
-
-	<div ng-if="mode==6">
-		<h2 class="ui yellow header"> Please wait for game to be ready</h2>
 	</div>
 
 	<!-- Fighting! votingover=false-->
@@ -44,21 +40,16 @@
 		<h1 class="ui yellow header" id="battle_timer">{{game.battle_timer-1}} second(s)</h1>
 	</div>
 
-	<!-- Winner!-->
-	<div ng-if="mode==3">
-		<h2 class="ui yellow header"> Please wait for game to be ready</h2>
-	</div>
-
 	<!-- Enter big idea!-->
 	<div ng-if="mode==4">
-		<form novalidate ng-submit="submitUberIdea()" class="ui segment form">
+		<form ng-submit="submitUberIdea()" class="ui segment form">
 			<div class="inline field">
 				<label>Champion ideas:</label>
 				<span class="ui mini button" ng-repeat = "champion in winners" ng-click="appendChampion(champion.name)">{{champion.name}} </span>
 			</div>
 			<div class="field">
 				<label>&Uuml;ber Idea:</label>
-				<textarea id="uberIdeaBox" ng-model = "uberIdea" rows="3"></textarea>
+				<textarea id="uberIdeaBox" ng-model = "uberIdea" rows="3" required></textarea>
 			</div>
 			<div class="inline field">
 				<label>Ideas used:</label>
@@ -67,10 +58,6 @@
 			<button class="ui button" type="submit">Submit</button>
 		</form>
 		<h1 class="ui yellow header" id="uber_timer">{{game.input_timer-1}} second(s)</h1>
-	</div>
-
-	<div ng-if="mode==7">
-		<h2 class="ui yellow header"> Please wait for game to be ready</h2>
 	</div>
 
 	<div ng-if="mode==5">

@@ -54,6 +54,11 @@ angular.module('myApp.view3', ['ngRoute'])
 		"http://jackie.elrok.com" + '/games/show', {main: true}
 			)
 		.then(function (res) {
+			if(res.data.error)
+			{
+				$scope.mode = 8
+				$scope.question = "Game already in progress"
+			}
 			$scope.game = res.data.game
 			$scope.rounds = res.data.game.rounds
 			$scope.questions = res.data.questions;
@@ -75,7 +80,7 @@ angular.module('myApp.view3', ['ngRoute'])
 
 	$scope.currentPlayers = function () {
 	$http.post(
-		"http://jackie.elrok.com" + '/games/current_players', {test: "yes"}
+		"http://jackie.elrok.com" + '/games/current_players', {game:$scope.game.id}
 			)
 		.then(function (res) {
 			$scope.players = res.data.players
