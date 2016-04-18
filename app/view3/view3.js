@@ -59,11 +59,14 @@ angular.module('myApp.view3', ['ngRoute'])
 				$scope.mode = 8
 				$scope.question = "Game already in progress"
 			}
-			$scope.game = res.data.game
-			$scope.rounds = res.data.game.rounds
-			$scope.questions = res.data.questions;
-			$scope.ideaTitleSwap();
-			$scope.intervalFunction();
+			else
+			{
+				$scope.game = res.data.game
+				$scope.rounds = res.data.game.rounds
+				$scope.questions = res.data.questions;
+				$scope.ideaTitleSwap();
+				$scope.intervalFunction();
+			}
 			console.log(res.data)
 			});
 	}
@@ -121,8 +124,7 @@ angular.module('myApp.view3', ['ngRoute'])
 				      		.then(function (res) {
 				      			if(res.data.error)
 				      			{
-				      				$scope.currentWinner = res.data.winner;
-									$scope.currentPlayerWinner = res.data.player;
+									$scope.currentWinner = undefined
 									$scope.players = res.data.players
 									$scope.mode = 7;
 									$scope.question = "No-one submitted an idea! But it's Game over anyway!"
@@ -194,29 +196,41 @@ angular.module('myApp.view3', ['ngRoute'])
 	      		"http://jackie.elrok.com" + '/ideas/display_winner', {game: $scope.game.id, round:$scope.currentRound}
 	      			)
 	      		.then(function (res) {
+	      			if(res.data.error)
+	      			{
+	      				$scope.currentRound++
+			      		$scope.ideaTitleSwap();
+			      		if($scope.currentRound*1 <= $scope.rounds*1)
+			      		{
+			      			$scope.mode = 2;
+			      			$scope.enterIdeas();
+			      		}
+			      		else
+			      			$scope.goUberRound()
+	      			}
+	      			else
+	      			{
 		      			$scope.currentWinner = res.data.winner;
-						$scope.currentWinner.votes = res.data.votes;
+		      			if ("votes" in res.data)
+							$scope.currentWinner.votes = res.data.votes;
 						$scope.currentPlayerWinner = res.data.player
 						$scope.mode = 4;
 						$scope.question = "Winner!"
 						$scope.winners.push(res.data.winner);
+						$timeout(function() {
+				      		$scope.currentRound++
+				      		$scope.ideaTitleSwap();
+				      		if($scope.currentRound*1 <= $scope.rounds*1)
+				      		{
+				      			$scope.mode = 2;
+				      			$scope.enterIdeas();
+				      		}
+				      		else
+				      			$scope.goUberRound()
+				      	}, 6000)
+					}
+
 	      			});
-	      		$timeout(function() {
-	      			$http.post(
-					"http://jackie.elrok.com" + '/ideas/decide_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
-						).then(function (res) {
-							console.log("winner decided")
-						})
-		      		$scope.currentRound++
-		      		$scope.ideaTitleSwap();
-		      		if($scope.currentRound*1 <= $scope.rounds*1)
-		      		{
-		      			$scope.mode = 2;
-		      			$scope.enterIdeas();
-		      		}
-		      		else
-		      			$scope.goUberRound()
-		      	}, 6000)
 
 	    	}
 		}, 1000);
@@ -227,9 +241,7 @@ angular.module('myApp.view3', ['ngRoute'])
 	}
 
 	$scope.setDec = function (param){
-		if(param < 0)
-			param = $scope.currentTime
-		$scope.decrement = param;
+		$scope.currentTime = 1
 	}
 
 	$scope.enterIdeas = function (){

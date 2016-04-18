@@ -33,11 +33,11 @@ $scope.rounds = 0;
 $scope.uberIdea = ""
 $scope.playerID = playerID.get();
 $scope.phase = 0;
-// var dispatcher = new WebSocketRails('jackie.elrok.com/websocket');
-// var channel = dispatcher.subscribe('sockets');
-// channel.bind('next', function() {
-//   $scope.nextPhase();
-// });
+var dispatcher = new WebSocketRails('jackie.elrok.com/websocket');
+var channel = dispatcher.subscribe('sockets');
+channel.bind('next', function() {
+  $scope.nextPhase();
+});
 
 
 // Temp variables
@@ -58,10 +58,22 @@ $scope.nextPhase = function () {
         $scope.$apply();
         break;
     case 2:
-	    $scope.mode = 9;
-	    $scope.$apply();
+    	console.log("Voting over")
     	$scope.currentRound++
-    	$scope.nextRound();
+    	if($scope.question != "No ideas submitted")
+	    {
+	    	console.log("hello")
+	    	$scope.mode = 8;
+	   		$scope.question = "Voting over"
+	   		$scope.$apply();
+	   		$timeout(function() {$scope.nextRound() , 5500})
+	   	}
+	   	else
+	   	{
+	   		console.log("hello2")
+	   		$scope.nextRound()
+	   	}
+    	
     	$scope.$apply();
     	break;
     case 3:
@@ -72,6 +84,7 @@ $scope.nextPhase = function () {
     	break;
     case 4:
     	$scope.mode = 8;
+    	$scope.question = "Game over"
     	$scope.$apply();
     	break;
     default:
@@ -124,14 +137,38 @@ $scope.submitIdea = function() {
 		"http://jackie.elrok.com" + '/ideas/create', {"idea": $scope.idea, "game":$scope.game.id, round: $scope.currentRound, player:$scope.playerID}
 			)
 		.then(function (res) {
-				$scope.idea = {};
-				$scope.mode = 0
-				$scope.question = ""
+				if(!res.data.error)
+				{
+					$scope.idea = {};
+					$scope.mode = 0
+					$scope.question = ""
+				}
+				else
+				{
+					alert("Too late to submit")
+				}
 
 			});
 	console.log($scope.ideas);
 	
 	
+};
+
+$scope.submitUberIdea = function() {
+	$http.post(
+		"http://jackie.elrok.com" + '/uber_ideas/create', {uber_idea: {description:$('#uberIdeaBox').val(), player_id: $scope.playerID}, game:$scope.game.id}
+			)
+	.then(function (res) {
+				if(!res.data.error)
+				{
+					$scope.mode = 0;
+					$scope.question = ""
+				}
+				else
+				{
+					alert("Too late to submit")
+				}
+			})
 };
 
 
@@ -143,6 +180,7 @@ $scope.ideaFromId = function (id_s) {
 
 
 $scope.requestIdeas = function () {
+	console.log("called")
 	$http.post(
 		"http://jackie.elrok.com" + '/ideas/index', {game: $scope.game.id, round: $scope.currentRound}
 			)
@@ -166,7 +204,10 @@ $scope.requestIdeas = function () {
 				}, 1000);
 			}
 			else
-				$scope.mode = 10;
+				{
+					$scope.mode = 8;
+					$scope.question = "No ideas submitted"
+				}
 			})
 	
 }
@@ -193,7 +234,10 @@ $scope.requestUberIdeas = function () {
 				}, 1000);
 			}
 			else
-				alert("Too early!")
+				{
+					$scope.mode = 8;
+					$scope.question = "Game over"
+				}
 			})
 	
 }
@@ -206,20 +250,18 @@ $scope.voteFor = function(whoId) {
 	$http.post(
 		"http://jackie.elrok.com" + '/ideas/vote', {game: $scope.game.id, id:$scope.vote, player: $scope.playerID}
 			).then(function (res) {
-				if(res.data.error == 0)
+				if(!res.data.error)
 				{
 					$scope.mode = 0;
 					$scope.question = ""
 					$scope.currentRound++
 				}
-				else if(res.data.error == 1)
+				else if(res.data.error == 2)
 					alert("Can't vote for yourself")
 				else
-					{
-						$scope.mode = 0;
-						$scope.question = ""
-						$scope.currentRound++
-					}
+				{
+					alert("Too late to vote")
+				}
 			})
 	//$scope.winners.push($scope.ideas[1]);
 };
@@ -231,27 +273,25 @@ $scope.uberVoteFor = function(whoId) {
 	$http.post(
 		"http://jackie.elrok.com" + '/uber_ideas/vote', {game: $scope.game.id, id:$scope.vote, player: $scope.playerID}
 			).then(function (res) {
-				if(res.data.error == 0)
+				if(!res.data.error)
 				{
 					$scope.mode = 8;
-					$scope.question = ""
+					$scope.question = "Game over"
 					$scope.currentRound++
 				}
-				else if(res.data.error == 1)
+				else if(res.data.error == 2)
 					alert("Can't vote for yourself")
 				else
-					{
-						$scope.mode = 0;
-						$scope.question = ""
-						$scope.currentRound++
-					}
+				{
+					alert("Too late to vote")
+				}
 			})
 	$scope.currentRound++
 	//$scope.winners.push($scope.ideas[1]);
 };
 
 $scope.nextRound = function() {
-$timeout(function() {
+
 		$scope.ideaTitleSwap();
 		if($scope.currentRound*1 <= $scope.rounds*1)
 			{
@@ -269,7 +309,6 @@ $timeout(function() {
 			}
 		else
 			$scope.goUberRound()
-	}, 6000)
 }
 
 $scope.goUberRound = function() {
@@ -304,34 +343,9 @@ $scope.ideasUsed = function() {
 	return counter;
 }
 
-$scope.submitUberIdea = function() {
-	$http.post(
-		"http://jackie.elrok.com" + '/uber_ideas/create', {uber_idea: {description:$('#uberIdeaBox').val(), player_id: $scope.playerID}, game:$scope.game.id}
-			)
-	console.log($scope.uberIdeas);
-	$scope.mode = 0;
-	$scope.question = ""
-};
 
 $scope.appendChampion = function(champion) {
 	$('#uberIdeaBox').val($('#uberIdeaBox').val()+champion);
-}
-
-$scope.refreshGame = function(game_details) {
-	$scope.currentRound = game_details.round
-	if(game_details.game_over)
-	{
-		$scope.mode = 8;
-	}
-	else if(game_details.voting_over)
-	{
-		$scope.nextRound;
-	}
-	else
-	{
-		$scope.requestIdeas();
-	}
-
 }
 
 if(!$scope.playerID)
