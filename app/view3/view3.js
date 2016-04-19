@@ -48,6 +48,21 @@ angular.module('myApp.view3', ['ngRoute'])
 		$location.path('/view2');
 	}
 
+	var dispatcher = new WebSocketRails('jackie.elrok.com/websocket');
+
+	dispatcher.bind('player_joined', function(data) {
+	  $scope.current_players++;
+	  $scope.$apply();
+	});
+
+	dispatcher.bind('ideas_submitted', function(data) {
+	 $scope.currentTime = 1;
+	  $scope.$apply();
+	});
+
+	$scope.$on('$routeChangeStart', function() {
+	    dispatcher.disconnect();
+	});
 
 	$scope.ideaTitleSwap = function () {
 		var res = $.grep($scope.questions, function(q){ return q.round == $scope.currentRound; })
@@ -74,8 +89,6 @@ angular.module('myApp.view3', ['ngRoute'])
 				$scope.game = res.data.game
 				$scope.rounds = res.data.game.rounds
 				$scope.questions = res.data.questions;
-				$scope.ideaTitleSwap();
-				$scope.intervalFunction();
 			}
 			console.log(res.data)
 			});
@@ -88,24 +101,8 @@ angular.module('myApp.view3', ['ngRoute'])
 			.then(function (res) {
 				$scope.mode = 2
 				$scope.enterIdeas();
+				$scope.ideaTitleSwap();
 				})
-	}
-
-	$scope.currentPlayers = function () {
-	$http.post(
-		"http://jackie.elrok.com" + '/games/current_players', {game:$scope.game.id}
-			)
-		.then(function (res) {
-			$scope.players = res.data.players
-			$scope.current_players = $scope.players.length
-			console.log($scope.current_players+"  "+$scope.game.player_count)
-			if ($scope.current_players*1 < $scope.game.player_count*1 || $scope.wait < 13)
-		    {	
-		    	$scope.wait++
-		    	//$scope.intervalFunction();
-		    }
-			console.log(res.data)
-			});
 	}
 
 
@@ -294,11 +291,6 @@ angular.module('myApp.view3', ['ngRoute'])
 		}, 1000);
 	}
 
-	$scope.intervalFunction = function(){
-	    $timeout(function() {
-	      $scope.currentPlayers();
-	    }, 5000)
-  	};
 
 	$scope.genArray = function(num) {
     	return new Array(num);   

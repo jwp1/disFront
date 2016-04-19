@@ -33,6 +33,8 @@ channel.bind('next', function(data) {
   $scope.nextPhase(data);
 });
 
+dispatcher.trigger('player_joined', {game_id:$scope.gameID})
+
 $scope.$on('$routeChangeStart', function() {
     dispatcher.disconnect();
 });
