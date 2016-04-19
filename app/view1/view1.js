@@ -53,7 +53,7 @@ if(!$scope.playerID || !$scope.gameID)
 
 $scope.nextPhase = function (data) {
 	console.log("Next")
-	console.log($scope.game)
+	console.log($scope.phase)
 	console.log("----")
 	console.log(data)
 	if($scope.game == undefined || data.game_id == $scope.game.id)
@@ -70,21 +70,11 @@ $scope.nextPhase = function (data) {
 	        $scope.$apply();
 	        break;
 	    case 2:
-	    	console.log("Voting over")
+	    	$scope.phase = 5;
 	    	$scope.currentRound++
-	    	if($scope.question != "No ideas submitted")
-		    {
-		    	$scope.mode = 8;
-		   		$scope.question = "Voting over"
-		   		$scope.$apply();
-		   		$timeout(function() {$scope.nextRound(data) , 5500})
-		   	}
-		   	else
-		   	{
-		   		$scope.nextRound(data)
-		   	}
-	    	
-	    	$scope.$apply();
+	    	$scope.mode = 8;
+	   		$scope.question = "Voting over"
+	   		$scope.$apply();
 	    	break;
 	    case 3:
 	    	$scope.currentRound++
@@ -95,6 +85,11 @@ $scope.nextPhase = function (data) {
 	    case 4:
 	    	$scope.mode = 8;
 	    	$scope.question = "Game over"
+	    	$scope.$apply();
+	    	break;
+    	case 5:
+    		console.log("in case")
+	    	$scope.nextRound(data)
 	    	$scope.$apply();
 	    	break;
 	    default:
@@ -271,6 +266,7 @@ $scope.uberVoteFor = function(whoId) {
 $scope.nextRound = function(data) {
 
 		$scope.ideaTitleSwap();
+		console.log("in nextround")
 		if(data.uber == undefined)
 			{
 				$scope.mode = 1;

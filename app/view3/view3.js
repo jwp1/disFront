@@ -227,7 +227,8 @@ angular.module('myApp.view3', ['ngRoute'])
 						$scope.question = "Winner!"
 						$scope.winners.push(res.data.winner);
 						$timeout(function() {
-				      		$scope.currentRound++
+							$scope.currentRound++
+							dispatcher.trigger('winner_display', {game_id:$scope.gameID, round:$scope.currentRound-1})
 				      		$scope.ideaTitleSwap();
 				      		if($scope.currentRound*1 <= $scope.rounds*1)
 				      		{
@@ -236,7 +237,7 @@ angular.module('myApp.view3', ['ngRoute'])
 				      		}
 				      		else
 				      			$scope.goUberRound()
-				      	}, 2000)
+				      	}, 5000)
 					}
 
 	      			});
