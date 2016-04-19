@@ -99,10 +99,10 @@ angular.module('myApp.view3', ['ngRoute'])
 			$scope.players = res.data.players
 			$scope.current_players = $scope.players.length
 			console.log($scope.current_players+"  "+$scope.game.player_count)
-			if ($scope.current_players*1 < $scope.game.player_count*1 && $scope.wait < 13)
+			if ($scope.current_players*1 < $scope.game.player_count*1 || $scope.wait < 13)
 		    {	
 		    	$scope.wait++
-		    	$scope.intervalFunction();
+		    	//$scope.intervalFunction();
 		    }
 			console.log(res.data)
 			});
@@ -223,7 +223,7 @@ angular.module('myApp.view3', ['ngRoute'])
 	      			else
 	      			{
 		      			$scope.currentWinner = res.data.winner;
-		      			if ("votes" in res.data)
+		      			if (res.data.votes !=undefined)
 							$scope.currentWinner.votes = res.data.votes;
 						$scope.currentPlayerWinner = res.data.player
 						$scope.mode = 4;
@@ -239,7 +239,7 @@ angular.module('myApp.view3', ['ngRoute'])
 				      		}
 				      		else
 				      			$scope.goUberRound()
-				      	}, 6000)
+				      	}, 2000)
 					}
 
 	      			});

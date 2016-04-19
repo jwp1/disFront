@@ -2,7 +2,7 @@
 	<div ng-if = "mode == 1">
 		<h1 class="bigtext">Waiting for players...</h1>
 		<h1 class="ui yellow header">{{current_players}} / {{game.player_count}}</h1>
-		<div class="ui button" ng-if="current_players == game.player_count" ng-click="startGame()">Start</div>
+		<div class="ui button" ng-click="startGame()">Start</div>
 	</div>
 	<div ng-if = "mode == 2">
 		<h1 class="bigtext">{{question}}</h1>
