@@ -263,7 +263,6 @@ angular.module('myApp.view3', ['ngRoute'])
 		$scope.decrement = 1;
 		$('#timer').html($scope.currentTime + ' second(s)');
 		var interval = setInterval(function(){
-			console.log("Dec:"+$scope.decrement)
 		  $scope.currentTime = $scope.currentTime-$scope.decrement;
 		  $('#timer').html($scope.currentTime + ' second(s)');
 		  if ($scope.currentTime < 0)
@@ -284,7 +283,6 @@ angular.module('myApp.view3', ['ngRoute'])
 		  			{
 		  				$scope.ideas = res.data.ideas
 						$scope.mode = 3;
-						console.log($scope.ideas);
 						$scope.question = "Choose a victor"
 						$scope.fights[0] = $scope.ideas
 						$scope.currentFight = 0;
@@ -301,16 +299,6 @@ angular.module('myApp.view3', ['ngRoute'])
     	return new Array(num);   
 	}
 
-	$scope.createGame = function (room) {
-		console.log($scope.room.questions)
-		$http.post(
-			"http://jackie.elrok.com" + '/games/create', {game:room}
-				)
-			.then(function (res) {
-				console.log("created")
-				})
-	
-}
 
 
 $scope.loadGame();
