@@ -17,10 +17,9 @@
 					<label>Name:</label>
 					{{fighter.name}}
 				</div>
-				<div class="inline field">
+				<div ng-if="fighter.description" class="inline field">
 					<label>Description:</label>
-					<span ng-if="fighter.description!=undefined">{{fighter.description}}</span>
-					<span ng-if="fighter.description==undefined">None</span>
+					{{fighter.description}}
 				</div>
 			</div>
 		</br>
@@ -37,13 +36,11 @@
 			</div>
 			<div class="inline field">
 				<label>Description:</label>
-				<span ng-if="currentWinner.description!=undefined">{{currentWinner.description}}</span>
-				<span ng-if="currentWinner.description==undefined">None</span>
+				{{currentWinner.description}}
 			</div>
 			<div class="inline field">
 				<label>Votes:</label>
-				<span ng-if="currentWinner.votes!=undefined">{{currentWinner.votes}}</span>
-				<span ng-if="currentWinner.votes==undefined">None, chosen at random</span>
+				{{currentWinner.votes}}
 			</div>
 			<div class="inline field">
 				<label>Player:</label>
@@ -63,10 +60,9 @@
 					<label>Name:</label>
 					{{winner.name}}
 				</div>
-				<div class="inline field">
+				<div ng-if="winner.description" class="inline field">
 					<label>Description:</label>
-					<span ng-if="winner.description!==undefined">{{winner.description}}</span>
-					<span ng-if="winner.description==undefined">None</span>
+					{{winner.description}}
 				</div>
 			</div>
 		</div>
@@ -79,12 +75,12 @@
 		<div ng-repeat="uber in uberIdeas track by $index">
 			<div class="ui form segment">
 				<div class="inline field">
-					<label>&Uuml;ber Idea:</label>
-					{{uber.description}}
-				</div>
-				<div class="field">
 					<label>Strength:</label>
 					{{uber.strength}}
+				</div>
+				<div class="field">
+					<label>&Uuml;ber Idea:</label>
+					{{uber.description}}
 				</div>
 			</div>
 			</br>
@@ -107,8 +103,7 @@
 			</div>
 			<div class="inline field">
 				<label>Votes:</label>
-				<span ng-if="currentWinner.votes!=undefined">{{currentWinner.votes}}</span>
-				<span ng-if="currentWinner.votes==undefined">None, chosen at random</span>
+				{{currentWinner.votes}}
 			</div>
 			<div class="inline field">
 				<label>Player:</label>

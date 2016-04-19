@@ -26,6 +26,7 @@ $scope.uberIdea = ""
 $scope.playerID = playerID.get();
 $scope.gameID = gameID.get();
 $scope.phase = 0;
+var interval;
 	
 var dispatcher = new WebSocketRails('jackie.elrok.com/websocket');
 var channel = dispatcher.subscribe('sockets');
@@ -55,6 +56,8 @@ $scope.nextPhase = function (data) {
 	console.log("Next")
 	console.log($scope.phase)
 	console.log("----")
+	if(interval)
+		clearInterval(interval);
 	console.log(data)
 	if($scope.game == undefined || data.game_id == $scope.game.id)
 	{
@@ -85,6 +88,7 @@ $scope.nextPhase = function (data) {
 	    case 4:
 	    	$scope.mode = 8;
 	    	$scope.question = "Game over"
+	    	dispatcher.disconnect();
 	    	$scope.$apply();
 	    	break;
     	case 5:
@@ -116,9 +120,9 @@ $scope.loadGame = function (data) {
 	$scope.questions = data.questions;
 	$scope.ideaTitleSwap();
 	$scope.mode=1
-    $scope.currentTime = $scope.game.input_timer-1;
+    $scope.currentTime = $scope.game.input_timer;
 	$('#timer').html($scope.currentTime + ' second(s)');
-	var interval = setInterval(function()
+	interval = setInterval(function()
 	{ 
 	  $scope.currentTime = $scope.currentTime-$scope.decrement;
 	  $('#timer').html($scope.currentTime + ' second(s)');
@@ -178,7 +182,7 @@ $scope.requestIdeas = function (data) {
 		$scope.currentFight = 0;
 		$scope.currentTime = $scope.game.battle_timer-1;
 		$('#battle_timer').html($scope.currentTime + ' second(s)');
-		var interval = setInterval(function()
+		interval = setInterval(function()
 		{ 
 		  $scope.currentTime = $scope.currentTime-$scope.decrement;
 		  $('#battle_timer').html($scope.currentTime + ' second(s)');
@@ -204,7 +208,7 @@ $scope.requestUberIdeas = function (data) {
 		$scope.question = "Choose a victor"
 		$scope.currentTime = $scope.game.battle_timer-1;
 		$('#uber_battle_timer').html($scope.currentTime + ' second(s)');
-		var interval = setInterval(function()
+		interval = setInterval(function()
 		{ 
 		  $scope.currentTime = $scope.currentTime-$scope.decrement;
 		  $('#uber_battle_timer').html($scope.currentTime + ' second(s)');
@@ -216,6 +220,7 @@ $scope.requestUberIdeas = function (data) {
 		{
 			$scope.mode = 8;
 			$scope.question = "Game over"
+			dispatcher.disconnect();
 		}
 	
 }
@@ -250,6 +255,7 @@ $scope.uberVoteFor = function(whoId) {
 			{
 				$scope.mode = 8;
 				$scope.question = "Game over"
+				dispatcher.disconnect();
 				$scope.$apply()
 			},function(data) {
 			  if(data.error == 2)
@@ -273,7 +279,7 @@ $scope.nextRound = function(data) {
 				$scope.phase = 1;
 				$scope.currentTime = $scope.game.input_timer-1;
 				$('#timer').html($scope.currentTime + ' second(s)');
-				var interval = setInterval(function()
+				interval = setInterval(function()
 				{ 
 				  $scope.currentTime = $scope.currentTime-$scope.decrement;
 				  $('#timer').html($scope.currentTime + ' second(s)');
@@ -293,7 +299,7 @@ $scope.goUberRound = function(data) {
 	$scope.currentFight++
 	$scope.currentTime = $scope.game.input_timer-1;
 				$('#uber_timer').html($scope.currentTime + ' second(s)');
-				var interval = setInterval(function()
+				interval = setInterval(function()
 				{ 
 				  $scope.currentTime = $scope.currentTime-$scope.decrement;
 				  $('#uber_timer').html($scope.currentTime + ' second(s)');

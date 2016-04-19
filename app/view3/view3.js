@@ -137,6 +137,7 @@ angular.module('myApp.view3', ['ngRoute'])
 									$scope.players = res.data.players
 									$scope.mode = 7;
 									$scope.question = "No-one submitted an idea! But it's Game over anyway!"
+									dispatcher.disconnect();
 				      			}});
 		  			}
 		  			else
@@ -170,10 +171,13 @@ angular.module('myApp.view3', ['ngRoute'])
 	      			if(res.data.error)
 	      			{
 	      				$scope.currentWinner = res.data.winner;
+	      				$scope.currentWinner.votes = res.data.votes !=undefined ? res.data.votes : "None, chosen at random"
+		      			$scope.currentWinner.description = res.data.winner.description !=undefined ? res.data.winner.votes : "None"
 						$scope.currentPlayerWinner = res.data.player;
 						$scope.players = res.data.players
 						$scope.mode = 7;
 						$scope.question = "No-one voted! But it's Game over anyway!"
+						dispatcher.disconnect();
 	      			}
 	      			else
 	      			{
@@ -182,6 +186,7 @@ angular.module('myApp.view3', ['ngRoute'])
 						$scope.players = res.data.players
 						$scope.mode = 7;
 						$scope.question = "Game over!"
+						dispatcher.disconnect();
 	      			}
 	      			
 	      			});
@@ -220,8 +225,8 @@ angular.module('myApp.view3', ['ngRoute'])
 	      			else
 	      			{
 		      			$scope.currentWinner = res.data.winner;
-		      			if (res.data.votes !=undefined)
-							$scope.currentWinner.votes = res.data.votes;
+		      			$scope.currentWinner.votes = res.data.votes !=undefined ? res.data.votes : "None, chosen at random"
+		      			$scope.currentWinner.description = res.data.winner.description !=undefined ? res.data.winner.votes : "None"
 						$scope.currentPlayerWinner = res.data.player
 						$scope.mode = 4;
 						$scope.question = "Winner!"
