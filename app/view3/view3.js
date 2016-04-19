@@ -171,8 +171,6 @@ angular.module('myApp.view3', ['ngRoute'])
 	      			if(res.data.error)
 	      			{
 	      				$scope.currentWinner = res.data.winner;
-	      				$scope.currentWinner.votes = res.data.votes !=undefined ? res.data.votes : "None, chosen at random"
-		      			$scope.currentWinner.description = res.data.winner.description !=undefined ? res.data.winner.votes : "None"
 						$scope.currentPlayerWinner = res.data.player;
 						$scope.players = res.data.players
 						$scope.mode = 7;
@@ -182,6 +180,7 @@ angular.module('myApp.view3', ['ngRoute'])
 	      			else
 	      			{
 		      			$scope.currentWinner = res.data.winner;
+		      			$scope.currentWinner.votes = res.data.winner.votes !=undefined ? res.data.votes : "None, chosen at random"
 						$scope.currentPlayerWinner = res.data.player;
 						$scope.players = res.data.players
 						$scope.mode = 7;
