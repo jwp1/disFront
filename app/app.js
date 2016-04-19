@@ -25,4 +25,20 @@ config(['$routeProvider', function($routeProvider) {
   get: get
  }
 
+})
+.factory('gameID', function() {
+ var savedData;
+ function set(data) {
+   console.log("GameID: "+data)
+   savedData = data;
+ }
+ function get() {
+  return savedData;
+ }
+
+ return {
+  set: set,
+  get: get
+ }
+
 });

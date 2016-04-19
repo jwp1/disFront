@@ -9,7 +9,7 @@ angular.module('myApp.view2', ['ngRoute'])
   });
 }])
 
-.controller('View2Ctrl', ['$scope', '$http', '$location', 'playerID', function($scope, $http, $location, playerID) {
+.controller('View2Ctrl', ['$scope', '$http', '$location', 'playerID', 'gameID', function($scope, $http, $location, playerID, gameID) {
 	$scope.selected = 0;
 	$scope.room = {};
 	$scope.room.player_count = 1;
@@ -28,6 +28,8 @@ angular.module('myApp.view2', ['ngRoute'])
 		"http://jackie.elrok.com" + '/games/create', {game:room}
 			)
 		.then(function (res) {
+			gameID.set(res.data.game)
+			$location.path('/view3');
 			if(res.data.error)
 				alert("Error creating game")
 			
@@ -44,9 +46,14 @@ angular.module('myApp.view2', ['ngRoute'])
 			{
 				alert("Can't join, game full/started or no name entered")
 			}
+			else if(res.data.duplicate)
+			{
+				alert("Someone already has that name!")
+			}
 			else
 			{
 				playerID.set(res.data.player)
+				gameID.set(res.data.game)
 				$location.path('/view1');
 			}
 			})

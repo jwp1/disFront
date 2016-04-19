@@ -9,7 +9,7 @@ angular.module('myApp.view3', ['ngRoute'])
   });
 }])
 
-.controller('View3Ctrl', ['$scope', '$http', '$timeout',function($scope, $http, $timeout) {
+.controller('View3Ctrl', ['$scope', '$http', '$timeout', 'gameID', '$location', function($scope, $http, $timeout, gameID, $location) {
 	$scope.questions = [];
 	// Modes:
 	// 0 - Wait
@@ -21,6 +21,7 @@ angular.module('myApp.view3', ['ngRoute'])
 	// 6 - Display final ideas
 	$scope.mode = 1;
 	$scope.idea = {};
+	$scope.wait = 0;
 	$scope.fights = [];
 	$scope.winners = [];
 	$scope.currentFight = [];
@@ -31,13 +32,22 @@ angular.module('myApp.view3', ['ngRoute'])
 	$scope.current_players = 0;
 	$scope.currentTime = 0;
 	$scope.decrement = 1;
-
+	$scope.gameID = gameID.get();
 	// Temp variables
 	$scope.ideas = [];
 	$scope.ideas[0] = {name: "Google", description: "A search engine"};
 	$scope.ideas[1] = {name: "Yahoo", description: "Another search engine"};
 	$scope.uberIdeas = [];
 	$scope.uberIdeas[0] = {id:0, description: "The functionality of google but with the aesthetic of yahoo",strength:2};
+
+	if(!$scope.gameID)
+	{
+		console.log($scope.gameID)
+		$scope.question = "Error joining"
+		$scope.mode = 99
+		$location.path('/view2');
+	}
+
 
 	$scope.ideaTitleSwap = function () {
 		var res = $.grep($scope.questions, function(q){ return q.round == $scope.currentRound; })
@@ -51,7 +61,7 @@ angular.module('myApp.view3', ['ngRoute'])
 
 	$scope.loadGame = function () {
 	$http.post(
-		"http://jackie.elrok.com" + '/games/show', {main: true}
+		"http://jackie.elrok.com" + '/games/show', {main: true, game:$scope.gameID}
 			)
 		.then(function (res) {
 			if(res.data.error)
@@ -88,8 +98,10 @@ angular.module('myApp.view3', ['ngRoute'])
 		.then(function (res) {
 			$scope.players = res.data.players
 			$scope.current_players = $scope.players.length
-			if ($scope.current_players < $scope.game.player_count)
-		    {
+			console.log($scope.current_players+"  "+$scope.game.player_count)
+			if ($scope.current_players*1 < $scope.game.player_count*1 && $scope.wait < 13)
+		    {	
+		    	$scope.wait++
 		    	$scope.intervalFunction();
 		    }
 			console.log(res.data)

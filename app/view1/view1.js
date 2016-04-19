@@ -9,7 +9,7 @@ angular.module('myApp.view1', ['ngRoute'])
   });
 }])
 
-.controller('View1Ctrl', ['$scope', '$http', 'playerID', '$location', '$timeout',function($scope, $http, playerID, $location, $timeout) {
+.controller('View1Ctrl', ['$scope', '$http', 'playerID', 'gameID', '$location', '$timeout',function($scope, $http, playerID, gameID, $location, $timeout) {
 
 
 $scope.questions = [];
@@ -32,64 +32,82 @@ $scope.decrement = 1;
 $scope.rounds = 0;
 $scope.uberIdea = ""
 $scope.playerID = playerID.get();
+$scope.gameID = gameID.get();
 $scope.phase = 0;
+	
 var dispatcher = new WebSocketRails('jackie.elrok.com/websocket');
 var channel = dispatcher.subscribe('sockets');
-channel.bind('next', function() {
-  $scope.nextPhase();
+channel.bind('next', function(data) {
+  $scope.nextPhase(data);
 });
 
+$scope.$on('$routeChangeStart', function() {
+    dispatcher.disconnect();
+});
 
 // Temp variables
 $scope.ideas = [];
 $scope.uberIdeas = [];
 
+if(!$scope.playerID || !$scope.gameID)
+	{
+		console.log($scope.playerID)
+		$scope.question = "Error joining"
+		$scope.mode = 99
+		$location.path('/view2');
+	}
 
-$scope.nextPhase = function () {
+$scope.nextPhase = function (data) {
 	console.log("Next")
-	switch($scope.phase) {
-    case 0:
-        $scope.loadGame();
-        $scope.phase = 1;
-        break;
-    case 1:
-        $scope.requestIdeas();
-        $scope.phase = 2;
-        $scope.$apply();
-        break;
-    case 2:
-    	console.log("Voting over")
-    	$scope.currentRound++
-    	if($scope.question != "No ideas submitted")
-	    {
-	    	console.log("hello")
+	console.log($scope.game)
+	console.log("----")
+	console.log(data)
+	if($scope.game == undefined || data == $scope.game.id)
+	{
+		switch($scope.phase) {
+	    case 0:
+	        $scope.loadGame();
+	        $scope.phase = 1;
+	        break;
+	    case 1:
+	        $scope.requestIdeas();
+	        $scope.phase = 2;
+	        $scope.$apply();
+	        break;
+	    case 2:
+	    	console.log("Voting over")
+	    	$scope.currentRound++
+	    	if($scope.question != "No ideas submitted")
+		    {
+		    	console.log("hello")
+		    	$scope.mode = 8;
+		   		$scope.question = "Voting over"
+		   		$scope.$apply();
+		   		$timeout(function() {$scope.nextRound() , 5500})
+		   	}
+		   	else
+		   	{
+		   		console.log("hello2")
+		   		$scope.nextRound()
+		   	}
+	    	
+	    	$scope.$apply();
+	    	break;
+	    case 3:
+	    	$scope.currentRound++
+	    	$scope.requestUberIdeas();
+	    	$scope.phase = 4;
+	    	$scope.$apply();
+	    	break;
+	    case 4:
 	    	$scope.mode = 8;
-	   		$scope.question = "Voting over"
-	   		$scope.$apply();
-	   		$timeout(function() {$scope.nextRound() , 5500})
-	   	}
-	   	else
-	   	{
-	   		console.log("hello2")
-	   		$scope.nextRound()
-	   	}
-    	
-    	$scope.$apply();
-    	break;
-    case 3:
-    	$scope.currentRound++
-    	$scope.requestUberIdeas();
-    	$scope.phase = 4;
-    	$scope.$apply();
-    	break;
-    case 4:
-    	$scope.mode = 8;
-    	$scope.question = "Game over"
-    	$scope.$apply();
-    	break;
-    default:
-        break;
-}
+	    	$scope.question = "Game over"
+	    	$scope.$apply();
+	    	break;
+	    default:
+	        break;
+    	}
+	}
 
 }
 $scope.ideaTitleSwap = function () {
@@ -104,7 +122,7 @@ $scope.ideaTitleSwap = function () {
 
 $scope.loadGame = function () {
 	$http.post(
-		"http://jackie.elrok.com" + '/games/show', {test: "yes"}
+		"http://jackie.elrok.com" + '/games/show', {game:$scope.gameID}
 			)
 		.then(function (res) {
 			if(res.data.error)
@@ -348,12 +366,5 @@ $scope.appendChampion = function(champion) {
 	$('#uberIdeaBox').val($('#uberIdeaBox').val()+champion);
 }
 
-if(!$scope.playerID)
-	{
-		console.log($scope.playerID)
-		$scope.question = "Error joining"
-		$scope.mode = 99
-		$location.path('/view2');
-	}
 
 }]);
