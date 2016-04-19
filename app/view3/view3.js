@@ -51,13 +51,19 @@ angular.module('myApp.view3', ['ngRoute'])
 	var dispatcher = new WebSocketRails('jackie.elrok.com/websocket');
 
 	dispatcher.bind('player_joined', function(data) {
-	  $scope.current_players++;
-	  $scope.$apply();
+		if($scope.gameID == data.game_id)
+	  	{
+	  		$scope.current_players = data.current_players;
+	  		$scope.$apply();
+	  	}
 	});
 
 	dispatcher.bind('ideas_submitted', function(data) {
-	 $scope.currentTime = 1;
-	  $scope.$apply();
+		if($scope.gameID == data.game_id)
+	  	{
+	 	$scope.currentTime = 1;
+	  	$scope.$apply();
+	  	}
 	});
 
 	$scope.$on('$routeChangeStart', function() {
@@ -212,6 +218,7 @@ angular.module('myApp.view3', ['ngRoute'])
 	      			if(res.data.error)
 	      			{
 	      				$scope.currentRound++
+	      				dispatcher.trigger('winner_display', {game_id:$scope.gameID, round:$scope.currentRound-1})
 			      		$scope.ideaTitleSwap();
 			      		if($scope.currentRound*1 <= $scope.rounds*1)
 			      		{

@@ -131,14 +131,12 @@ $scope.loadGame = function (data) {
 	}, 1000);
 }
 $scope.submitIdea = function() {
-	//Temp just put in array
+	$scope.mode = 0
+	$scope.question = ""
 	dispatcher.trigger('submit_idea', {"idea": $scope.idea, "game":$scope.game.id, round: $scope.currentRound, player:$scope.playerID},
 		function(data) 
 		{
-			$scope.idea = {};
-			$scope.mode = 0
-			$scope.question = ""
-			$scope.$apply();		
+			$scope.idea = {};		
 		},
 		function(data) 
 		{
@@ -230,14 +228,18 @@ $scope.voteFor = function(whoId) {
 	//Temp just put in array
 	$scope.vote = whoId;
 	console.log($scope.vote);
+	$scope.mode = 0;
+  	$scope.question = ""
 	dispatcher.trigger('vote', {game: $scope.game.id, id:$scope.vote, player: $scope.playerID},function(data) {
 		console.log("hello")
-	  	$scope.mode = 0;
-	  	$scope.question = ""
-	  	$scope.$apply();
 	},function(data) {
 	  if(data.error == 2)
-	  	alert("Can't vote for yourself")
+	  	{
+	  		alert("Can't vote for yourself")
+	  		$scope.mode = 2;
+	  		$scope.question = "Choose a victor"
+	  		$scope.$apply();
+	  	}
 	  else
 	  {
 	  	alert("Too late to vote")
