@@ -1,15 +1,15 @@
 'use strict';
 
-angular.module('myApp.view1', ['ngRoute'])
+angular.module('brainstrom.play', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/view1', {
-    templateUrl: 'view1/view1.html',
-    controller: 'View1Ctrl'
+  $routeProvider.when('/play', {
+    templateUrl: 'play/play.html',
+    controller: 'PlayCtrl'
   });
 }])
 
-.controller('View1Ctrl', ['$scope', '$http', 'playerID', 'gameID', '$location', '$timeout',function($scope, $http, playerID, gameID, $location, $timeout) {
+.controller('PlayCtrl', ['$scope', '$http', 'playerID', 'gameID', '$location', '$timeout',function($scope, $http, playerID, gameID, $location, $timeout) {
 
 
 $scope.questions = [];
@@ -46,19 +46,14 @@ $scope.uberIdeas = [];
 
 if(!$scope.playerID || !$scope.gameID)
 	{
-		console.log($scope.playerID)
 		$scope.question = "Error joining"
 		$scope.mode = 99
-		$location.path('/view2');
+		$location.path('/menu');
 	}
 
 $scope.nextPhase = function (data) {
-	console.log("Next")
-	console.log($scope.phase)
-	console.log("----")
 	if(interval)
 		clearInterval(interval);
-	console.log(data)
 	if($scope.game == undefined || data.game_id == $scope.game.id)
 	{
 		switch($scope.phase) {
@@ -92,7 +87,6 @@ $scope.nextPhase = function (data) {
 	    	$scope.$apply();
 	    	break;
     	case 5:
-    		console.log("in case")
 	    	$scope.nextRound(data)
 	    	$scope.$apply();
 	    	break;
@@ -104,8 +98,6 @@ $scope.nextPhase = function (data) {
 }
 $scope.ideaTitleSwap = function () {
 	var res = $.grep($scope.questions, function(q){ return q.round == $scope.currentRound; })
-	console.log("hhhhhhh")
-	console.log(res)
 	if (res.length == 1)
 		$scope.question = res[0].name
 	else
@@ -174,9 +166,7 @@ $scope.requestIdeas = function (data) {
 	{
 		$scope.ideas = data.ideas
 		$scope.mode = 2;
-		console.log($scope.ideas);
 		$scope.question = "Choose a victor"
-		$scope.fights[0] = $scope.ideas
 		$scope.currentFight = 0;
 		$scope.currentTime = $scope.game.battle_timer-1;
 		$('#battle_timer').html($scope.currentTime + ' second(s)');
@@ -202,7 +192,6 @@ $scope.requestUberIdeas = function (data) {
 	{
 		$scope.uberIdeas = data.uber_ideas
 		$scope.mode = 5;
-		console.log($scope.uberIdeas);
 		$scope.question = "Choose a victor"
 		$scope.currentTime = $scope.game.battle_timer-1;
 		$('#uber_battle_timer').html($scope.currentTime + ' second(s)');
@@ -227,11 +216,10 @@ $scope.requestUberIdeas = function (data) {
 $scope.voteFor = function(whoId) {
 	//Temp just put in array
 	$scope.vote = whoId;
-	console.log($scope.vote);
 	$scope.mode = 0;
   	$scope.question = ""
 	dispatcher.trigger('vote', {game: $scope.game.id, id:$scope.vote, player: $scope.playerID},function(data) {
-		console.log("hello")
+
 	},function(data) {
 	  if(data.error == 2)
 	  	{
@@ -251,7 +239,6 @@ $scope.voteFor = function(whoId) {
 $scope.uberVoteFor = function(whoId) {
 	//Temp just put in array
 	$scope.vote = whoId;
-	console.log($scope.vote);
 	dispatcher.trigger('vote_uber', {game: $scope.game.id, id:$scope.vote, player: $scope.playerID},
 		function(data) 
 			{
@@ -274,7 +261,6 @@ $scope.uberVoteFor = function(whoId) {
 $scope.nextRound = function(data) {
 
 		$scope.ideaTitleSwap();
-		console.log("in nextround")
 		if(data.uber == undefined)
 			{
 				$scope.mode = 1;

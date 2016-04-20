@@ -1,15 +1,15 @@
 'use strict';
 
-angular.module('myApp.view2', ['ngRoute'])
+angular.module('brainstrom.menu', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/view2', {
-    templateUrl: 'view2/view2.html',
-    controller: 'View2Ctrl'
+  $routeProvider.when('/menu', {
+    templateUrl: 'menu/menu.html',
+    controller: 'MenuCtrl'
   });
 }])
 
-.controller('View2Ctrl', ['$scope', '$http', '$location', 'playerID', 'gameID', function($scope, $http, $location, playerID, gameID) {
+.controller('MenuCtrl', ['$scope', '$http', '$location', 'playerID', 'gameID', function($scope, $http, $location, playerID, gameID) {
 	$scope.selected = 0;
 	$scope.room = {};
 	$scope.room.player_count = 1;
@@ -23,13 +23,12 @@ angular.module('myApp.view2', ['ngRoute'])
 	}
 
 	$scope.createGame = function (room) {
-		console.log($scope.room.questions)
 		$http.post(
 		"http://jackie.elrok.com" + '/games/create', {game:room}
 			)
 		.then(function (res) {
 			gameID.set(res.data.game)
-			$location.path('/view3');
+			$location.path('/host');
 			if(res.data.error)
 				alert("Error creating game")
 			
@@ -54,7 +53,7 @@ angular.module('myApp.view2', ['ngRoute'])
 			{
 				playerID.set(res.data.player)
 				gameID.set(res.data.game)
-				$location.path('/view1');
+				$location.path('/play');
 			}
 			})
 	}
