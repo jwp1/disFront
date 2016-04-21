@@ -8,8 +8,14 @@
 		<form ng-submit="joinGame(player)" class="ui segment form">
 			<div class="field">
 				<label>Player name:</label>
-				<div class="loading">
+				<div>
 					<input ng-model = "player.name" placeholder="Player name..." type="text" required>
+				</div>
+			</div>
+			<div class="field">
+				<label>Room code:</label>
+				<div>
+					<input ng-model = "player.room" placeholder="Room code..." type="text" required>
 				</div>
 			</div>
 			 <button class="ui button" type="submit">Join</button>

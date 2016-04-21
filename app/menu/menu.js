@@ -52,7 +52,7 @@ angular.module('brainstrom.menu', ['ngRoute'])
 			else
 			{
 				playerID.set(res.data.player)
-				gameID.set(res.data.game)
+				gameID.set(player.room)
 				$location.path('/play');
 			}
 			})

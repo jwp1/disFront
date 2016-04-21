@@ -54,7 +54,7 @@ if(!$scope.playerID || !$scope.gameID)
 $scope.nextPhase = function (data) {
 	if(interval)
 		clearInterval(interval);
-	if($scope.game == undefined || data.game_id == $scope.game.id)
+	if(data.game_id == $scope.gameID)
 	{
 		switch($scope.phase) {
 	    case 0:
