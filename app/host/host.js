@@ -168,7 +168,7 @@ angular.module('brainstrom.host', ['ngRoute'])
 	      			else
 	      			{
 		      			$scope.currentWinner = res.data.winner;
-		      			$scope.currentWinner.votes = res.data.winner.votes !=undefined ? res.data.votes : "None, chosen at random"
+		      			$scope.currentWinner.votes = res.data.winner.votes !=undefined ? res.data.winner.votes : "None, chosen at random"
 						$scope.currentPlayerWinner = res.data.player;
 						$scope.players = res.data.players
 						$scope.mode = 7;
