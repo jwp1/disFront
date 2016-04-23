@@ -1,24 +1,16 @@
 'use strict';
 
-angular.module('myApp.view3', ['ngRoute'])
+angular.module('brainstrom.host', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/view3', {
-    templateUrl: 'view3/view3.html',
-    controller: 'View3Ctrl'
+  $routeProvider.when('/host', {
+    templateUrl: 'host/host.html',
+    controller: 'HostCtrl'
   });
 }])
 
-.controller('View3Ctrl', ['$scope', '$http', '$timeout',function($scope, $http, $timeout) {
+.controller('HostCtrl', ['$scope', '$http', '$timeout', 'gameID', '$location', function($scope, $http, $timeout, gameID, $location) {
 	$scope.questions = [];
-	// Modes:
-	// 0 - Wait
-	// 1 - Enter idea
-	// 2 - Vote for an idea
-	// 3 - Display winner
-	// 4 - Enter final idea
-	// 5 - Vote final idea
-	// 6 - Display final ideas
 	$scope.mode = 1;
 	$scope.idea = {};
 	$scope.fights = [];
@@ -30,19 +22,42 @@ angular.module('myApp.view3', ['ngRoute'])
 	$scope.uberIdea = ""
 	$scope.current_players = 0;
 	$scope.currentTime = 0;
-
-
-	// Temp variables
+	$scope.decrement = 1;
+	$scope.gameID = gameID.get();
 	$scope.ideas = [];
-	$scope.ideas[0] = {name: "Google", description: "A search engine"};
-	$scope.ideas[1] = {name: "Yahoo", description: "Another search engine"};
 	$scope.uberIdeas = [];
-	$scope.uberIdeas[0] = {id:0, description: "The functionality of google but with the aesthetic of yahoo",strength:2};
+
+	if(!$scope.gameID)
+	{
+		$scope.question = "Error joining"
+		$scope.mode = 99
+		$location.path('/menu');
+	}
+
+	var dispatcher = new WebSocketRails('jackie.elrok.com/websocket');
+
+	dispatcher.bind('player_joined', function(data) {
+		if($scope.gameID == data.game_id)
+	  	{
+	  		$scope.current_players = data.current_players;
+	  		$scope.$apply();
+	  	}
+	});
+
+	dispatcher.bind('ideas_submitted', function(data) {
+		if($scope.gameID == data.game_id)
+	  	{
+	 	$scope.currentTime = 1;
+	  	$scope.$apply();
+	  	}
+	});
+
+	$scope.$on('$routeChangeStart', function() {
+	    dispatcher.disconnect();
+	});
 
 	$scope.ideaTitleSwap = function () {
 		var res = $.grep($scope.questions, function(q){ return q.round == $scope.currentRound; })
-		console.log("hhhhhhh")
-		console.log(res)
 		if (res.length == 1)
 			$scope.question = res[0].name
 		else
@@ -51,15 +66,20 @@ angular.module('myApp.view3', ['ngRoute'])
 
 	$scope.loadGame = function () {
 	$http.post(
-		"http://jackie.elrok.com" + '/games/show', {main: true}
+		"http://jackie.elrok.com" + '/games/show', {main: true, game:$scope.gameID}
 			)
 		.then(function (res) {
-			$scope.game = res.data.game
-			$scope.rounds = res.data.game.rounds
-			$scope.questions = res.data.questions;
-			$scope.ideaTitleSwap();
-			$scope.intervalFunction();
-			console.log(res.data)
+			if(res.data.error)
+			{
+				$scope.mode = 8
+				$scope.question = "Game already in progress"
+			}
+			else
+			{
+				$scope.game = res.data.game
+				$scope.rounds = res.data.game.rounds
+				$scope.questions = res.data.questions;
+			}
 			});
 	}
 
@@ -70,47 +90,43 @@ angular.module('myApp.view3', ['ngRoute'])
 			.then(function (res) {
 				$scope.mode = 2
 				$scope.enterIdeas();
+				$scope.ideaTitleSwap();
 				})
-	}
-
-	$scope.currentPlayers = function () {
-	$http.post(
-		"http://jackie.elrok.com" + '/games/current_players', {test: "yes"}
-			)
-		.then(function (res) {
-			$scope.players = res.data.players
-			$scope.current_players = $scope.players.length
-			if ($scope.current_players < $scope.game.player_count)
-		    {
-		    	$scope.intervalFunction();
-		    }
-			console.log(res.data)
-			});
 	}
 
 
 	$scope.goUberRound = function() {
-		console.log($scope.winners)
 		$scope.question = "Combine the winners"
 		$scope.mode = 5;
 		$scope.currentTime = $scope.game.input_timer;
+		$scope.decrement = 1;
 		$('#uber_timer').html($scope.currentTime + ' second(s)');
 		var interval = setInterval(function(){
-		  $scope.currentTime--;
+		  $scope.currentTime = $scope.currentTime-$scope.decrement;
 		  $('#uber_timer').html($scope.currentTime + ' second(s)');
-		  if ($scope.currentTime == 0)
+		  if ($scope.currentTime < 0)
 			{
 				clearInterval(interval);
-				$('#uber_timer').html('');
+				$('#uber_timer').html($scope.game.input_timer + ' second(s)');
 			     $http.post(
 				"http://jackie.elrok.com" + '/uber_ideas/index', {game: $scope.game.id, main:true, round:$scope.currentRound}
 					)
 				.then(function (res) {
 					if(res.data.error)
 		  			{
-		  				$scope.mode = 2
-		  				$scope.question = "YOU ALL SUCK AND DIDN'T SUBMIT IDEAS"
-		  				$scope.finishUberRound();
+		  				$scope.mode = 8
+				      		$http.post(
+				      		"http://jackie.elrok.com" + '/uber_ideas/display_uber_winner', {game: $scope.game.id}
+				      			)
+				      		.then(function (res) {
+				      			if(res.data.error)
+				      			{
+									$scope.currentWinner = undefined
+									$scope.players = res.data.players
+									$scope.mode = 7;
+									$scope.question = "No-one submitted an idea! But it's Game over anyway!"
+									dispatcher.disconnect();
+				      			}});
 		  			}
 		  			else
 		  			{
@@ -127,31 +143,37 @@ angular.module('myApp.view3', ['ngRoute'])
 
 	$scope.finishUberRound = function (){
 		$scope.currentTime = $scope.game.battle_timer;
+		$scope.decrement = 1;
 		$('#uber_battle_timer').html($scope.currentTime + ' second(s)');
 		var interval = setInterval(function(){
-		  $scope.currentTime--;
+		  $scope.currentTime = $scope.currentTime-$scope.decrement;
 		  $('#uber_battle_timer').html($scope.currentTime + ' second(s)');
-		  if ($scope.currentTime == 0)
+		  if ($scope.currentTime < 0)
 			{
 				clearInterval(interval);
-				$('#uber_battle_timer').html('');
+				$('#uber_battle_timer').html($scope.game.battle_timer + ' second(s)');
 	      		$http.post(
 	      		"http://jackie.elrok.com" + '/uber_ideas/display_uber_winner', {game: $scope.game.id}
 	      			)
 	      		.then(function (res) {
 	      			if(res.data.error)
 	      			{
-	      				$scope.mode = 2
-	      				$scope.question = "YOU ALL SUCK AND DIDN'T VOTE"
+	      				$scope.currentWinner = res.data.winner;
+						$scope.currentPlayerWinner = res.data.player;
+						$scope.players = res.data.players
+						$scope.mode = 7;
+						$scope.question = "No-one voted! But it's Game over anyway!"
+						dispatcher.disconnect();
 	      			}
 	      			else
 	      			{
 		      			$scope.currentWinner = res.data.winner;
-						$scope.currentWinner.votes = res.data.votes;
+		      			$scope.currentWinner.votes = res.data.winner.votes !=undefined ? res.data.votes : "None, chosen at random"
 						$scope.currentPlayerWinner = res.data.player;
 						$scope.players = res.data.players
 						$scope.mode = 7;
 						$scope.question = "Game over!"
+						dispatcher.disconnect();
 	      			}
 	      			
 	      			});
@@ -162,50 +184,56 @@ angular.module('myApp.view3', ['ngRoute'])
 
 	$scope.finishRound = function (){
 		$scope.currentTime = $scope.game.battle_timer;
+		$scope.decrement = 1;
 		$('#battle_timer').html($scope.currentTime + ' second(s)');
 		var interval = setInterval(function(){
-		  $scope.currentTime--;
+		  $scope.currentTime = $scope.currentTime-$scope.decrement;
 		  $('#battle_timer').html($scope.currentTime + ' second(s)');
-		  if ($scope.currentTime == 0)
+		  if ($scope.currentTime < 0)
 			{
 				clearInterval(interval);
-				$('#battle_timer').html('');
+				$('#battle_timer').html($scope.game.battle_timer + ' second(s)');
 	      		$http.post(
 	      		"http://jackie.elrok.com" + '/ideas/display_winner', {game: $scope.game.id, round:$scope.currentRound}
 	      			)
 	      		.then(function (res) {
 	      			if(res.data.error)
 	      			{
-	      				$scope.mode = 2
-	      				$scope.question = "YOU ALL SUCK AND DIDN'T VOTE"
+	      				$scope.currentRound++
+	      				dispatcher.trigger('winner_display', {game_id:$scope.gameID, round:$scope.currentRound-1})
+			      		$scope.ideaTitleSwap();
+			      		if($scope.currentRound*1 <= $scope.rounds*1)
+			      		{
+			      			$scope.mode = 2;
+			      			$scope.enterIdeas();
+			      		}
+			      		else
+			      			$scope.goUberRound()
 	      			}
 	      			else
 	      			{
 		      			$scope.currentWinner = res.data.winner;
-						$scope.currentWinner.votes = res.data.votes;
+		      			$scope.currentWinner.votes = res.data.votes !=undefined ? res.data.votes : "None, chosen at random"
+		      			$scope.currentWinner.description = res.data.winner.description !=undefined ? res.data.winner.votes : "None"
 						$scope.currentPlayerWinner = res.data.player
 						$scope.mode = 4;
 						$scope.question = "Winner!"
 						$scope.winners.push(res.data.winner);
-	      			}
-	      			
+						$timeout(function() {
+							$scope.currentRound++
+							dispatcher.trigger('winner_display', {game_id:$scope.gameID, round:$scope.currentRound-1})
+				      		$scope.ideaTitleSwap();
+				      		if($scope.currentRound*1 <= $scope.rounds*1)
+				      		{
+				      			$scope.mode = 2;
+				      			$scope.enterIdeas();
+				      		}
+				      		else
+				      			$scope.goUberRound()
+				      	}, 5000)
+					}
+
 	      			});
-	      		$timeout(function() {
-	      			$http.post(
-					"http://jackie.elrok.com" + '/ideas/decide_winner', {game: $scope.game.id, id: "hello",  round: $scope.currentRound}
-						).then(function (res) {
-							console.log("winner decided")
-						})
-		      		$scope.currentRound++
-		      		$scope.ideaTitleSwap();
-		      		if($scope.currentRound*1 <= $scope.rounds*1)
-		      		{
-		      			$scope.mode = 2;
-		      			$scope.enterIdeas();
-		      		}
-		      		else
-		      			$scope.goUberRound()
-		      	}, 3000)
 
 	    	}
 		}, 1000);
@@ -215,33 +243,36 @@ angular.module('myApp.view3', ['ngRoute'])
 		return $scope.currentTime;
 	}
 
+	$scope.setDec = function (param){
+		$scope.currentTime = 1
+	}
+
 	$scope.enterIdeas = function (){
 		$scope.currentTime = $scope.game.input_timer;
+		$scope.decrement = 1;
 		$('#timer').html($scope.currentTime + ' second(s)');
 		var interval = setInterval(function(){
-		  $scope.currentTime--;
+		  $scope.currentTime = $scope.currentTime-$scope.decrement;
 		  $('#timer').html($scope.currentTime + ' second(s)');
-		  if ($scope.currentTime == 0)
+		  if ($scope.currentTime < 0)
 			{
 				clearInterval(interval);
-				$('#timer').html('');
+				$('#timer').html($scope.game.input_timer + ' second(s)');
 			     $http.post(
 				"http://jackie.elrok.com" + '/ideas/index', {game: $scope.game.id, round: $scope.currentRound, main:true}
 					)
 				.then(function (res) {
 					if(res.data.error)
 		  			{
-		  				$scope.mode = 2
-		  				$scope.question = "YOU ALL SUCK AND DIDN'T SUBMIT IDEAS"
+		  				$scope.mode = 8
+		  				$scope.question = "No-one submitted an idea"
 		  				$scope.finishRound();
 		  			}
 		  			else
 		  			{
 		  				$scope.ideas = res.data.ideas
 						$scope.mode = 3;
-						console.log($scope.ideas);
 						$scope.question = "Choose a victor"
-						$scope.fights[0] = $scope.ideas
 						$scope.currentFight = 0;
 						$scope.finishRound();
 		  			}
@@ -251,26 +282,11 @@ angular.module('myApp.view3', ['ngRoute'])
 		}, 1000);
 	}
 
-	$scope.intervalFunction = function(){
-	    $timeout(function() {
-	      $scope.currentPlayers();
-	    }, 5000)
-  	};
 
 	$scope.genArray = function(num) {
     	return new Array(num);   
 	}
 
-	$scope.createGame = function (room) {
-		console.log($scope.room.questions)
-		$http.post(
-			"http://jackie.elrok.com" + '/games/create', {game:room}
-				)
-			.then(function (res) {
-				console.log("created")
-				})
-	
-}
 
 
 $scope.loadGame();

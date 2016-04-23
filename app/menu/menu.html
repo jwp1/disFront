@@ -1,0 +1,51 @@
+<div class="ui center aligned container">
+<h1 class="ui yellow header">Welcome to Brainstrom</h1>
+	<div class="ui button" ng-class="selected == 1 && 'active' || ''" ng-click="selected = 1">Join a game</div> 
+	<div class="ui button" ng-class="selected == 2 && 'active' || ''" ng-click="selected = 2">Start a new game</div>
+	</br>
+	</br>
+	<div ng-if="selected==1">
+		<form ng-submit="joinGame(player)" class="ui segment form">
+			<div class="field">
+				<label>Player name:</label>
+				<div>
+					<input ng-model = "player.name" placeholder="Player name..." type="text" required>
+				</div>
+			</div>
+			<div class="field">
+				<label>Room code:</label>
+				<div>
+					<input ng-model = "player.room" placeholder="Room code..." type="text" required>
+				</div>
+			</div>
+			 <button class="ui button" type="submit">Join</button>
+		</form>
+	</div>
+	<div ng-if="selected==2">
+		<form ng-submit="createGame(room)" class="ui segment form">
+			<div class="field">
+				<label>No. of players:</label>
+				<input ng-model = "room.player_count" placeholder="Player count" type="number" min="1" required>
+			</div>
+			<div class="field">
+				<label>Rounds:</label>
+				<input ng-model = "room.rounds" placeholder="Rounds" type="number" min="1" required>
+			</div>
+			<div class="field">
+				<label>Questions (optional):</label>
+				<div ng-repeat="i in genArray(room.rounds) track by $index"> 
+					<input ng-model = "room.questions[$index]" placeholder="Question {{$index+1}} (leave blank for free round)" type="text">
+				</div>
+			</div>
+			<div class="field">
+				<label>Input-timer (seconds):</label>
+				<input ng-model = "room.input_timer" placeholder="Input-timer" type="number" min="10" step="5" required>
+			</div>
+			<div class="field">
+				<label>Battle-timer (seconds):</label>
+				<input ng-model = "room.battle_timer" placeholder="Battle-timer" type="number" min="5" step="5" required>
+			</div>
+			 <button class="ui button" type="submit">Start</button>
+		</form>
+	</div>
+</div>

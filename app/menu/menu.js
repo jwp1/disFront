@@ -1,20 +1,19 @@
 'use strict';
 
-angular.module('myApp.view2', ['ngRoute'])
+angular.module('brainstrom.menu', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/view2', {
-    templateUrl: 'view2/view2.html',
-    controller: 'View2Ctrl'
+  $routeProvider.when('/menu', {
+    templateUrl: 'menu/menu.html',
+    controller: 'MenuCtrl'
   });
 }])
 
-.controller('View2Ctrl', ['$scope', '$http', '$location', 'playerID', function($scope, $http, $location, playerID) {
+.controller('MenuCtrl', ['$scope', '$http', '$location', 'playerID', 'gameID', function($scope, $http, $location, playerID, gameID) {
 	$scope.selected = 0;
-
 	$scope.room = {};
-	$scope.room.player_count = 4;
-	$scope.room.rounds = 3;
+	$scope.room.player_count = 1;
+	$scope.room.rounds = 1;
 	$scope.room.input_timer = 10;
 	$scope.room.battle_timer = 5;
 	$scope.room.questions = {};
@@ -24,12 +23,15 @@ angular.module('myApp.view2', ['ngRoute'])
 	}
 
 	$scope.createGame = function (room) {
-		console.log($scope.room.questions)
-	$http.post(
+		$http.post(
 		"http://jackie.elrok.com" + '/games/create', {game:room}
 			)
 		.then(function (res) {
-			console.log("woo")
+			gameID.set(res.data.game)
+			$location.path('/host');
+			if(res.data.error)
+				alert("Error creating game")
+			
 			})
 	
 	}
@@ -41,12 +43,17 @@ angular.module('myApp.view2', ['ngRoute'])
 		.then(function (res) {
 			if(res.data.error)
 			{
-				alert("Can't join")
+				alert("Can't join, game full/started or no name entered")
+			}
+			else if(res.data.duplicate)
+			{
+				alert("Someone already has that name!")
 			}
 			else
 			{
 				playerID.set(res.data.player)
-				$location.path('/view1');
+				gameID.set(player.room)
+				$location.path('/play');
 			}
 			})
 	}

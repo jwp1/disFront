@@ -31,4 +31,19 @@
 
 .bigtext {
   font-size: 400%;
+  color: #dbb952;
+  text-shadow:
+    -2px -2px 0 #a77702,
+    2px -2px 0 #a77702,
+    -2px 2px 0 #a77702,
+    2px 2px 0 #a77702; 
+}
+
+.header {
+  color: #dbb952;
+  text-shadow:
+    -2px -2px 0 #a77702,
+    2px -2px 0 #a77702,
+    -2px 2px 0 #a77702,
+    2px 2px 0 #a77702; 
 }

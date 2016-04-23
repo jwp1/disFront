@@ -1,17 +1,16 @@
 <div class="ui center aligned container">
-<h1 class="ui header">{{question}}</h1>
-	<!-- Entering Idea!-->
+<h1 class="ui yellow header">{{question}}</h1>
+	<!-- Waiting for game to start-->
 	<div ng-if="mode==0">
-		<h2 class="ui header"> Please wait for game to be ready</h2>
-		 <div class="ui button" ng-click="loadGame()">Start</div>
+		<h2 class="ui yellow header"> Please wait for game to be ready</h2>
 	</div>
 
+	<!-- Entering Idea! votingover=true-->
 	<div ng-if="mode==1">
-		<form novalidate ng-submit="submitIdea()" class="ui segment form">
+		<form ng-submit="submitIdea()" class="ui segment form">
 			<div class="field">
 				<label>Name:</label>
-				<input ng-model = "idea.name" placeholder="Idea name..." type="text">
-				
+				<input ng-model = "idea.name" placeholder="Idea name..." type="text" required>
 			</div>
 			<div class="field">
 				<label>Description:</label>
@@ -19,47 +18,38 @@
 			</div>
 			 <button class="ui button" type="submit">Submit</button>
 		</form>
+		<h1 class="ui yellow header" id="timer">{{game.input_timer}} second(s)</h1>
 	</div>
 
-	<div ng-if="mode==6">
-		<h2 class="ui header"> Please wait for game to be ready</h2>
-		<div class="ui button" ng-click="requestIdeas()">Next</div>
-	</div>
-
-	<!-- Fighting!-->
+	<!-- Fighting! votingover=false-->
 	<div ng-if="mode==2">
-		<div ng-repeat="fighter in fights[currentFight] track by $index">
+		<div ng-repeat="fighter in ideas track by $index">
 			<div ng-click="voteFor(fighter.id)" class="ui form segment">
 				<div class="inline field">
 					<label>Name:</label>
 					{{fighter.name}}
 				</div>
-				<div class="inline field">
+				<div ng-if="fighter.description" class="inline field">
 					<label>Description:</label>
 					{{fighter.description}}
 				</div>
 			</div>
-			<span ng-if="$index != fights[currentFight].length-1">VS</br></br></span>
+			</br>
 		</div>
 		</br>
-	</div>
-
-	<!-- Winner!-->
-	<div ng-if="mode==3">
-		<h2 class="ui header"> Please wait for game to be ready</h2>
-		<div class="ui button" ng-click="testNext()">Next</div>
+		<h1 class="ui yellow header" id="battle_timer">{{game.battle_timer}} second(s)</h1>
 	</div>
 
 	<!-- Enter big idea!-->
 	<div ng-if="mode==4">
-		<form novalidate ng-submit="submitUberIdea()" class="ui segment form">
+		<form ng-submit="submitUberIdea()" class="ui segment form">
 			<div class="inline field">
 				<label>Champion ideas:</label>
 				<span class="ui mini button" ng-repeat = "champion in winners" ng-click="appendChampion(champion.name)">{{champion.name}} </span>
 			</div>
 			<div class="field">
 				<label>&Uuml;ber Idea:</label>
-				<textarea id="uberIdeaBox" ng-model = "uberIdea" rows="3"></textarea>
+				<textarea id="uberIdeaBox" ng-model = "uberIdea" rows="3" required></textarea>
 			</div>
 			<div class="inline field">
 				<label>Ideas used:</label>
@@ -67,11 +57,7 @@
 			</div>
 			<button class="ui button" type="submit">Submit</button>
 		</form>
-	</div>
-
-	<div ng-if="mode==7">
-		<h2 class="ui header"> Please wait for game to be ready</h2>
-		<div class="ui button" ng-click="requestUberIdeas()">Next</div>
+		<h1 class="ui yellow header" id="uber_timer">{{game.input_timer}} second(s)</h1>
 	</div>
 
 	<div ng-if="mode==5">
@@ -86,13 +72,20 @@
 					{{uber.description}}
 				</div>
 			</div>
-			<span ng-if="$index%2==0">VS</br></br></span>
+			</br>
 		</div>
+		<h1 class="ui yellow header" id="uber_battle_timer">{{game.battle_timer}} second(s)</h1>
 	</div>
 
-	<div ng-if="mode==8">
-		<h2 class="ui header"> Game over :)</h2>
+	<div ng-if="mode==8">`
 	</div>
 
+	<div ng-if="mode==9">
+		<h2 class="ui yellow header"> Voting over </h2>
+	</div>
+
+	<div ng-if="mode==10">
+		<h2 class="ui yellow header"> No-body submitted an idea </h2>
+	</div>
 
 </div>
