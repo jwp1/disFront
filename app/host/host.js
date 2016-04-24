@@ -1,15 +1,15 @@
 'use strict';
 
-angular.module('brainstrom.host', ['ngRoute'])
+var host = angular.module('brainstrom.host', ['ngRoute'])
 
-.config(['$routeProvider', function($routeProvider) {
+host.config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/host', {
     templateUrl: 'host/host.html',
     controller: 'HostCtrl'
   });
 }])
 
-.controller('HostCtrl', ['$scope', '$http', '$timeout', 'gameID', '$location', function($scope, $http, $timeout, gameID, $location) {
+host.controller('HostCtrl', ['$scope', '$http', '$timeout', 'gameID', '$location', function($scope, $http, $timeout, gameID, $location) {
 	$scope.questions = [];
 	$scope.mode = 1;
 	$scope.idea = {};

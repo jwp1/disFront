@@ -1,15 +1,15 @@
 'use strict';
 
-angular.module('brainstrom.play', ['ngRoute'])
+var play = angular.module('brainstrom.play', ['ngRoute'])
 
-.config(['$routeProvider', function($routeProvider) {
+play.config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/play', {
     templateUrl: 'play/play.html',
     controller: 'PlayCtrl'
   });
 }])
 
-.controller('PlayCtrl', ['$scope', '$http', 'playerID', 'gameID', '$location', '$timeout',function($scope, $http, playerID, gameID, $location, $timeout) {
+play.controller('PlayCtrl', ['$scope', '$http', 'playerID', 'gameID', '$location', '$timeout',function($scope, $http, playerID, gameID, $location, $timeout) {
 
 
 $scope.questions = [];

@@ -1,15 +1,15 @@
 'use strict';
 
-angular.module('brainstrom.menu', ['ngRoute'])
+var menu = angular.module('brainstrom.menu', ['ngRoute'])
 
-.config(['$routeProvider', function($routeProvider) {
+menu.config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/menu', {
     templateUrl: 'menu/menu.html',
     controller: 'MenuCtrl'
   });
 }])
 
-.controller('MenuCtrl', ['$scope', '$http', '$location', 'playerID', 'gameID', function($scope, $http, $location, playerID, gameID) {
+menu.controller('MenuCtrl', ['$scope', '$http', '$location', 'playerID', 'gameID', function($scope, $http, $location, playerID, gameID) {
 	$scope.selected = 0;
 	$scope.room = {};
 	$scope.room.player_count = 1;

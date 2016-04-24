@@ -1,16 +1,18 @@
 'use strict';
 
 // Declare app level module which depends on views, and components
-angular.module('brainstrom', [
+var app = angular.module('brainstrom', [
   'ngRoute',
   'brainstrom.play',
   'brainstrom.menu',
-  'brainstrom.host'
-]).
-config(['$routeProvider', function($routeProvider) {
+  'brainstrom.host' 
+]);
+
+app.config(['$routeProvider', function($routeProvider) {
   $routeProvider.otherwise({redirectTo: '/menu'});
-}])
-.factory('playerID', function() {
+}]);
+
+app.factory('playerID', function() {
  var savedData;
  function set(data) {
    savedData = data;
@@ -25,7 +27,7 @@ config(['$routeProvider', function($routeProvider) {
  }
 
 })
-.factory('gameID', function() {
+app.factory('gameID', function() {
  var savedData;
  function set(data) {
    console.log("GameID: "+data)

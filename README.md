@@ -9,4 +9,4 @@ Using AngularJS and SemanticUI
 
 Makes use of websocket_rails javascript https://github.com/websocket-rails/websocket-rails-js
 
-Will require manual updating of target URLs in HTTP and websockets
+Will require manual updating of target URLs in HTTP and websockets in each controller
