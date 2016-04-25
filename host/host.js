@@ -214,7 +214,7 @@ host.controller('HostCtrl', ['$scope', '$http', '$timeout', 'gameID', '$location
 	      			{
 		      			$scope.currentWinner = res.data.winner;
 		      			$scope.currentWinner.votes = res.data.votes !=undefined ? res.data.votes : "None, chosen at random"
-		      			$scope.currentWinner.description = res.data.winner.description !=undefined ? res.data.winner.votes : "None"
+		      			$scope.currentWinner.description = res.data.winner.description !=undefined ? res.data.winner.description : "None"
 						$scope.currentPlayerWinner = res.data.player
 						$scope.mode = 4;
 						$scope.question = "Winner!"
